@@ -4,7 +4,7 @@ import { Container, Typography, Box, CircularProgress, Backdrop } from '@mui/mat
 import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
 import CollectMedicationCard from '../components/stages/CollectMedicationCard'
 import ResultBox from '../components/ResultBox';
-import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WhatsOnChain, WalletInterface, WalletClient, CreateActionOutput, LockingScript } from '@bsv/sdk'
+import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WalletInterface, WalletClient, CreateActionOutput, LockingScript } from '@bsv/sdk'
 import SubmissionsLog from '@/components/SubmissionsLog';
 import { saveSubmission, getAllSubmissions } from '@/utils/db';
 import prescriptions from '@/utils/prescriptions.json';
