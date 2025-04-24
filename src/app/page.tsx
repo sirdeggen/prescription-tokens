@@ -251,7 +251,7 @@ const App: React.FC = () => {
     // Create a new pushdrop token
     const pushdrop = new PushDrop(wallet)
     const customInstructions = {
-        protocolID: [0, 'natural gas data integrity'] as WalletProtocol,
+        protocolID: [0, 'medical prescription'] as WalletProtocol,
         keyID: Utils.toBase64(sha)
     }
 
@@ -272,11 +272,11 @@ const App: React.FC = () => {
     if (spend) {
       const sha = Hash.sha256(JSON.stringify(spend.data))
       const customInstructions = {
-        protocolID: [0, 'natural gas data integrity'] as WalletProtocol,
+        protocolID: [0, 'medical prescription'] as WalletProtocol,
         keyID: Utils.toBase64(sha)
       }
       const tokens = await wallet.listOutputs({
-        basket: 'natural gas',
+        basket: 'prescription',
         includeCustomInstructions: true,
         include: 'entire transactions',
         limit: 1000
@@ -345,7 +345,7 @@ const App: React.FC = () => {
       satoshis: 1,
       outputDescription: 'natural gas supply chain token',
       customInstructions: JSON.stringify(customInstructions),
-      basket: 'natural gas'
+      basket: 'prescription'
     }]
 
 
