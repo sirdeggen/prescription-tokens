@@ -13,11 +13,11 @@ export const cardMediaSx: SxProps<Theme> = {
 export const cardContainerSx: SxProps<Theme> = {
   width: '100%',
   height: 'auto',
-  borderRadius: 4,
+  borderRadius: 2,
   transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out',
   '&:hover': {
     transform: 'translateY(-4px)',
-    boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+    boxShadow: '0 8px 24px rgba(44, 110, 142, 0.15)'
   }
 };
 
@@ -33,10 +33,12 @@ export const disabledCardSx: SxProps<Theme> = {
 
 // Typography styles
 export const cardTitleSx: SxProps<Theme> = {
-  fontSize: 18,
-  fontWeight: 500
+  fontSize: 20,
+  fontWeight: 600,
+  color: '#2c6e8e'
 };
 
 export const cardDescriptionSx: SxProps<Theme> = {
-  fontSize: 14
+  fontSize: 15,
+  color: '#607d8b'
 };

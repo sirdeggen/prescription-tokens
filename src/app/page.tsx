@@ -1,39 +1,40 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Box, CircularProgress, Backdrop } from '@mui/material';
-import WellheadCard from '../components/stages/WellheadCard';
-import GatheringCard from '../components/stages/GatheringCard';
-import ProcessingCard from '../components/stages/ProcessingCard';
-import TransmissionCard from '../components/stages/TransmissionCard';
-import StorageCard from '../components/stages/StorageCard';
-import LNGExportCard from '../components/stages/LNGExportCard';
+import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
+import CollectMedicationCard from '../components/stages/CollectMedicationCard';
 import ResultBox from '../components/ResultBox';
-import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WhatsOnChain } from '@bsv/sdk'
+import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WhatsOnChain, WalletInterface, WalletClient, CreateActionOutput } from '@bsv/sdk'
 import SubmissionsLog from '@/components/SubmissionsLog';
 import { saveSubmission, getAllSubmissions } from '@/utils/db';
 
 export interface DataEntry {
   entryId: string;
   timestamp: string;
-  location?: {
-    latitude: number;
-    longitude: number;
+  patient?: {
+    patientId: string;
+    name: string;
+    dateOfBirth: string;
   };
-  wellInfo?: {
-    wellId: string;
-    operator: string;
+  prescriber?: {
+    prescriberNPI: string;
+    name: string;
+    clinic: string;
   };
-  measurements?: {
-    flowRateMcfh: number;
-    pressurePsi: number;
-    temperatureF: number;
-    composition: {
-      methanePct: number;
-      ethanePct: number;
-      propanePct: number;
-      co2Pct: number;
-      nitrogenPct: number;
-    };
+  medication?: {
+    medicationName: string;
+    ndc: string;
+    dosage: string;
+    quantity: number;
+    refills: number;
+    instructions: string;
+    expirationDate: string;
+  };
+  pharmacy?: {
+    pharmacyNPI: string;
+    name: string;
+    pharmacist: string;
+    dispensedDate: string;
   };
   [key: string]: unknown;
 }
@@ -61,12 +62,8 @@ type BitailsResponse = {
 
 const App: React.FC = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [wellheadQueue, setWellheadQueue] = useState<QueueEntry[]>([]);
-  const [gatheringQueue, setGatheringQueue] = useState<QueueEntry[]>([]);
-  const [processingQueue, setProcessingQueue] = useState<QueueEntry[]>([]);
-  const [transmissionQueue, setTransmissionQueue] = useState<QueueEntry[]>([]);
-  const [storageQueue, setStorageQueue] = useState<QueueEntry[]>([]);
-  const [lngExportQueue, setLngExportQueue] = useState<QueueEntry[]>([]);
+  const [createPrescriptionQueue, setCreatePrescriptionQueue] = useState<QueueEntry[]>([]);
+  const [collectMedicationQueue, setCollectMedicationQueue] = useState<QueueEntry[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingStep, setSubmittingStep] = useState<string | null>(null);
 
@@ -87,23 +84,11 @@ const App: React.FC = () => {
       // add unspent tokens to the appropriate queue
       unspentSubmissions.forEach(token => {
         switch (token.step) {
-          case 'Wellhead':
-            setWellheadQueue((prev) => [...prev, token])
+          case 'Create Prescription':
+            setCreatePrescriptionQueue((prev) => [...prev, token])
             break
-          case 'Gathering':
-            setGatheringQueue((prev) => [...prev, token])
-            break
-          case 'Processing':
-            setProcessingQueue((prev) => [...prev, token])
-            break
-          case 'Transmission':
-            setTransmissionQueue((prev) => [...prev, token])
-            break
-          case 'Storage':
-            setStorageQueue((prev) => [...prev, token])
-            break
-          case 'LNG Export':
-            setLngExportQueue((prev) => [...prev, token])
+          case 'Collect Medication':
+            setCollectMedicationQueue((prev) => [...prev, token])
             break
         }
       })
@@ -131,18 +116,10 @@ const App: React.FC = () => {
 
   const grabTokenFromPreviousStep = async (step: string) => {
     switch (step) {
-        case 'Wellhead':
+        case 'Create Prescription':
           return undefined
-        case 'Gathering':
-          return wellheadQueue[0]
-        case 'Processing':
-          return gatheringQueue[0]
-        case 'Transmission':
-          return processingQueue[0]
-        case 'Storage':
-          return transmissionQueue[0]
-        case 'LNG Export':
-          return storageQueue[0]
+        case 'Collect Medication':
+          return createPrescriptionQueue[0]
       }
   }
 
@@ -172,28 +149,12 @@ const App: React.FC = () => {
       setSubmissions(prev => [...prev, newSubmission]);
 
       switch (step) {
-        case 'Wellhead':
-          setWellheadQueue((prev) => [...prev, { data, txid, step }])
+        case 'Create Prescription':
+          setCreatePrescriptionQueue((prev) => [...prev, { data, txid, step }])
           break
-        case 'Gathering':
-          setGatheringQueue((prev) => [...prev, { data, txid, step }])
-          setWellheadQueue((prev) => prev.slice(1))
-          break
-        case 'Processing':
-          setProcessingQueue((prev) => [...prev, { data, txid, step }])
-          setGatheringQueue((prev) => prev.slice(1))
-          break
-        case 'Transmission':
-          setTransmissionQueue((prev) => [...prev, { data, txid, step }])
-          setProcessingQueue((prev) => prev.slice(1))
-          break
-        case 'Storage':
-          setStorageQueue((prev) => [...prev, { data, txid, step }])
-          setTransmissionQueue((prev) => prev.slice(1))
-          break
-        case 'LNG Export':
-          setLngExportQueue((prev) => [...prev, { data, txid, step }])
-          setStorageQueue((prev) => prev.slice(1))
+        case 'Collect Medication':
+          setCollectMedicationQueue((prev) => [...prev, { data, txid, step }])
+          setCreatePrescriptionQueue((prev) => prev.slice(1))
           break
       }
     } catch (error) {
@@ -233,49 +194,39 @@ const App: React.FC = () => {
 
   /**
    * Uses the BSV Blockchain to create a token capturing the data as a hash, timestamping it, 
-   * and assigning ownership to the token which represents the volume of gas.
+   * and assigning ownership to the token which represents the medical prescription.
    * 
    * @param data The data to be stored
    * @param step The step of the process
    * @returns The transaction ID and broadcast response
    */
   async function createTokenOnBSV(data: DataEntry, step: string, spend?: QueueEntry | null): Promise<{ txid: string, arc: unknown }> {
+    const patientWallet = new WalletClient('json-api', 'prescriptions.vercel.app')
+    const { publicKey: patientPublicKey } = await patientWallet.getPublicKey({ identityKey: true })
+    const doctorWallet = new HTTPWalletJSON('https://prescriptions.vercel.app', 'https://prescriptions.vercel.app/api')
+    const { publicKey: doctorPublicKey } = await doctorWallet.getPublicKey({ identityKey: true })
     
-    // Initialize the wallet client with the remote signer to emulate IoT Device signing off on its data.
-    const wallet = new HTTPWalletJSON('https://natural-chain.vercel.app', 'https://natural-chain.vercel.app/api')
-
-    // Create a hash of the data
-    const sha = Hash.sha256(JSON.stringify(data))
-    const shasha = Hash.sha256(sha)
-
-    // Create a new pushdrop token
-    const pushdrop = new PushDrop(wallet)
-    const customInstructions = {
-        protocolID: [0, 'medical prescription'] as WalletProtocol,
-        keyID: Utils.toBase64(sha)
+    let wallet: WalletInterface
+    let counterparty: string
+    if (step === 'Create Prescription') {
+      wallet = doctorWallet
+      counterparty = patientPublicKey
+    } else {
+      wallet = patientWallet
+      counterparty = doctorPublicKey
     }
 
-    // Create a locking script for the pushdrop token
-    const lockingScript = await pushdrop.lock(
-      [Utils.toArray(step, 'utf8'), shasha],
-      customInstructions.protocolID,
-      customInstructions.keyID,
-      'self',
-      true,
-      true,
-      'after'
-    )
-
+    let outputs: CreateActionOutput[] | undefined = undefined
     let inputs: CreateActionInput[] | undefined = undefined
-    let knownTxids: string[] | undefined = undefined
     let inputBEEF: BEEF | undefined = undefined
     if (spend) {
       const sha = Hash.sha256(JSON.stringify(spend.data))
       const customInstructions = {
         protocolID: [0, 'medical prescription'] as WalletProtocol,
-        keyID: Utils.toBase64(sha)
+        keyID: Utils.toBase64(sha),
+        counterparty
       }
-      const tokens = await wallet.listOutputs({
+      const tokens = await doctorWallet.listOutputs({
         basket: 'prescription',
         includeCustomInstructions: true,
         include: 'entire transactions',
@@ -300,18 +251,13 @@ const App: React.FC = () => {
           const unlockingScriptTemplate = pushdrop.unlock(
             customInstructions.protocolID,
             customInstructions.keyID,
-            'self',
+            customInstructions.counterparty,
             'single',
             true,
             1,
             sourceTransaction.outputs[vout].lockingScript
           )
           const txDummy = new Transaction()
-          if (!knownTxids) {
-            knownTxids = []
-          }
-          knownTxids.push(txid)
-
           txDummy.addInput({
             sourceTransaction,
             sourceOutputIndex: vout,
@@ -334,29 +280,49 @@ const App: React.FC = () => {
           inputs.push({
             unlockingScript: txDummy.inputs[0].unlockingScript?.toHex() as string,
             outpoint: output.outpoint,
-            inputDescription: 'natural gas supply chain token'
+            inputDescription: 'medical prescription token'
           })
         }
       }
+    } else {
+      // Create a hash of the data
+      const sha = Hash.sha256(JSON.stringify(data))
+      const shasha = Hash.sha256(sha)
+
+      // Create a new pushdrop token
+      const pushdrop = new PushDrop(wallet)
+      const customInstructions = {
+          protocolID: [0, 'medical prescription'] as WalletProtocol,
+          keyID: Utils.toBase64(sha),
+          counterparty
+      }
+
+      // Create a locking script for the pushdrop token
+      const lockingScript = await pushdrop.lock(
+        [Utils.toArray(step, 'utf8'), shasha],
+        customInstructions.protocolID,
+        customInstructions.keyID,
+        counterparty,
+        true,
+        true,
+        'after'
+      )
+
+      outputs = [{
+        lockingScript: lockingScript.toHex(),
+        satoshis: 1,
+        outputDescription: 'medical prescription token',
+        customInstructions: JSON.stringify(customInstructions),
+        basket: 'prescription'
+      }]
     }
-
-    const outputs = [{
-      lockingScript: lockingScript.toHex(),
-      satoshis: 1,
-      outputDescription: 'natural gas supply chain token',
-      customInstructions: JSON.stringify(customInstructions),
-      basket: 'prescription'
-    }]
-
 
     const res = await wallet.createAction({
       inputBEEF,
-      description: 'record data within an NFT for natural gas supply chain tracking',
+      description: 'Tracking the creation and fullfilment of a prescription',
       inputs,
       outputs,
       options: {
-        trustSelf: 'known',
-        knownTxids,
         randomizeOutputs: false
       }
     })
@@ -367,108 +333,60 @@ const App: React.FC = () => {
       }
     }))
     console.log({ arc })
+    if (step !== 'Create Prescription') {
+      await doctorWallet.relinquishOutput({
+        basket: 'prescription',
+        output: inputs?.[0].outpoint as string
+      })
+    }
     return { txid: res.txid as string, arc }
   }
 
   const simulateData = {
-    wellhead: {
-      entryId: 'whd-001234567',
+    createPrescription: {
+      entryId: 'rx-001234567',
       timestamp: new Date().toISOString(),
-      location: { latitude: 31.9686, longitude: -99.9018 },
-      wellInfo: { wellId: 'TX-WELL-087654', operator: 'TexStar Energy LLC' },
-      measurements: {
-        flowRateMcfh: 1050.75,
-        pressurePsi: 1450,
-        temperatureF: 95.3,
-        composition: {
-          methanePct: 89.5,
-          ethanePct: 4.1,
-          propanePct: 1.8,
-          co2Pct: 0.6,
-          nitrogenPct: 4.0
-        },
+      patient: { 
+        patientId: 'PT10987654',
+        name: 'Jane Smith',
+        dateOfBirth: '1985-06-15'
       },
+      prescriber: { 
+        prescriberNPI: '1234567890', 
+        name: 'Dr. Robert Johnson',
+        clinic: 'City Medical Center'
+      },
+      medication: {
+        medicationName: 'Amoxicillin',
+        ndc: '76329-3030-01',
+        dosage: '500mg',
+        quantity: 30,
+        refills: 0,
+        instructions: 'Take 1 capsule by mouth 3 times daily for 10 days',
+        expirationDate: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0] // 30 days from now
+      }
     },
-    gathering: {
-      entryId: 'ctp-987654321',
+    collectMedication: {
+      entryId: 'rx-fill-987654321',
       timestamp: new Date().toISOString(),
-      transferLocation: 'Gathering Point A32',
-      operatorFrom: 'TexStar Energy LLC',
-      operatorTo: 'BlueLine Pipelines Inc.',
-      volumeTransferredMcf: 24500.50,
-      pressurePsi: 1350,
-      energyContentBTUcf: 1035,
-      composition: {
-        methanePct: 90.1,
-        ethanePct: 4.0,
-        propanePct: 1.7,
-        co2Pct: 0.5,
-        nitrogenPct: 3.7
+      patient: { 
+        patientId: 'PT10987654', 
+        name: 'Jane Smith',
+        dateOfBirth: '1985-06-15'
       },
-    },
-    processing: {
-      entryId: 'ppd-112233445',
-      timestamp: new Date().toISOString(),
-      processingFacility: { facilityId: 'Eagle Ford Processing Plant #4', operator: 'Eagle Gas Processors Ltd.' },
-      inputVolumeMcf: 120000,
-      outputVolumeMcf: 115800,
-      processingLossPct: 3.5,
-      energyContentOutBTUcf: 1040,
-      compositionOut: {
-        methanePct: 92.8,
-        ethanePct: 3.5,
-        propanePct: 1.5,
-        co2Pct: 0.4,
-        nitrogenPct: 1.8
+      pharmacy: {
+        pharmacyNPI: '9876543210',
+        name: 'Main Street Pharmacy',
+        pharmacist: 'Lisa Chen, PharmD',
+        dispensedDate: new Date().toISOString().split('T')[0]
       },
-    },
-    transmission: {
-      entryId: 'tpd-556677889',
-      timestamp: new Date().toISOString(),
-      pipelineSegment: { segmentId: 'TransP-Section-18B', operator: 'Interstate Transmission Co.' },
-      measurements: { 
-        flowRateMcfh: 25500, 
-        pressurePsi: 950, 
-        temperatureF: 78.4 
-      },
-      composition: {
-        methanePct: 92.7,
-        ethanePct: 3.6,
-        propanePct: 1.4,
-        co2Pct: 0.3,
-        nitrogenPct: 2.0
-      },
-    },
-    storage: {
-      entryId: 'sfd-998877665',
-      timestamp: new Date().toISOString(),
-      storageFacility: { facilityId: 'Gulf Coast Storage Hub 12', operator: 'Southern Storage Partners' },
-      operation: 'injection',
-      volumeMcf: 75000,
-      storagePressurePsi: 1700,
-      inventoryLevelPct: 68.2,
-      composition: {
-        methanePct: 92.6,
-        ethanePct: 3.7,
-        propanePct: 1.3,
-        co2Pct: 0.3,
-        nitrogenPct: 2.1
-      },
-    },
-    lngExport: {
-      entryId: 'lng-443322110',
-      timestamp: new Date().toISOString(),
-      lngTerminal: { terminalId: 'Freeport LNG Export Terminal', operator: 'Freeport LNG LLC' },
-      vessel: { vesselId: 'LNG Tanker Neptune Star', destinationPort: 'Rotterdam, Netherlands' },
-      exportVolumeMcf: 300000,
-      energyContentBTUcf: 1045,
-      composition: {
-        methanePct: 92.9,
-        ethanePct: 3.5,
-        propanePct: 1.4,
-        co2Pct: 0.2,
-        nitrogenPct: 2.0
-      },
+      medication: {
+        medicationName: 'Amoxicillin',
+        ndc: '76329-3030-01',
+        dosage: '500mg',
+        quantity: 30,
+        instructions: 'Take 1 capsule by mouth 3 times daily for 10 days'
+      }
     }
   };
 
@@ -486,7 +404,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, minHeight: '100vh', display: 'flex', flexDirection: 'column', pt: 10, pb: 40 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, minHeight: '100vh', display: 'flex', flexDirection: 'column', pt: 10, pb: 40, bgcolor: '#f8fbfd',  }}>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={isSubmitting}
@@ -501,49 +419,21 @@ const App: React.FC = () => {
         }}>
           <CircularProgress color="primary" />
           <Typography variant="h6" sx={{ mt: 2, color: 'white' }}>
-            {submittingStep ? `Processing ${submittingStep} data...` : 'Processing...'}
+            {submittingStep ? `Processing ${submittingStep}...` : 'Processing...'}
           </Typography>
         </Box>
       </Backdrop>
-      <Typography variant="h4" align="center" color="white" gutterBottom sx={{ py: 5,fontWeight: 'bold', textShadow: '2px 1px 2px black' }}>
-        Natural Gas Blockchain Demo
+      <Typography variant="h4" align="center" color="#2c6e8e" gutterBottom sx={{ py: 5, fontWeight: 'bold', textShadow: '1px 1px 1px rgba(0,0,0,0.1)' }}>
+        Medical Prescription Blockchain Demo
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><WellheadCard data={simulateData.wellhead} onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={wellheadQueue[wellheadQueue.length - 1]} />
+          <Box sx={cardSx}><CreatePrescriptionCard data={simulateData.createPrescription} onSubmit={handleSubmitData} /></Box>
+          <ResultBox entry={createPrescriptionQueue[createPrescriptionQueue.length - 1]} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><GatheringCard data={simulateData.gathering} onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={gatheringQueue[gatheringQueue.length - 1]} />
-        </Box>
-        <Box sx={boxSx}>
-          <Box sx={cardSx}><ProcessingCard data={simulateData.processing} onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={processingQueue[processingQueue.length - 1]} />
-        </Box>
-        <Box sx={boxSx}>
-          <Box sx={cardSx}><TransmissionCard data={{
-                ...simulateData.transmission,
-                measurements: {
-                  ...simulateData.transmission.measurements,
-                  composition: {
-                    methanePct: 90,
-                    ethanePct: 5,
-                    propanePct: 3,
-                    co2Pct: 1,
-                    nitrogenPct: 1
-                  }
-                }
-          }} onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={transmissionQueue[transmissionQueue.length - 1]} />
-        </Box>
-        <Box sx={boxSx}>
-          <Box sx={cardSx}><StorageCard data={simulateData.storage} onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={storageQueue[storageQueue.length - 1]} />
-        </Box>
-        <Box sx={boxSx}>
-          <Box sx={cardSx}><LNGExportCard data={simulateData.lngExport} onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={lngExportQueue[lngExportQueue.length - 1]} />
+          <Box sx={cardSx}><CollectMedicationCard data={simulateData.collectMedication} onSubmit={handleSubmitData} /></Box>
+          <ResultBox entry={collectMedicationQueue[collectMedicationQueue.length - 1]} />
         </Box>
       </Box>
       <SubmissionsLog submissions={submissions} />
