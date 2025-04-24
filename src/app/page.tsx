@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Box, CircularProgress, Backdrop } from '@mui/material';
 import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
-import CollectMedicationCard from '../components/stages/CollectMedicationCard';
+import CollectMedicationCard from '../components/stages/CollectMedicationCard'
 import ResultBox from '../components/ResultBox';
 import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WhatsOnChain, WalletInterface, WalletClient, CreateActionOutput } from '@bsv/sdk'
 import SubmissionsLog from '@/components/SubmissionsLog';
@@ -203,7 +203,7 @@ const App: React.FC = () => {
   async function createTokenOnBSV(data: DataEntry, step: string, spend?: QueueEntry | null): Promise<{ txid: string, arc: unknown }> {
     const patientWallet = new WalletClient('json-api', 'prescriptions.vercel.app')
     const { publicKey: patientPublicKey } = await patientWallet.getPublicKey({ identityKey: true })
-    const doctorWallet = new HTTPWalletJSON('https://prescriptions.vercel.app', 'https://prescriptions.vercel.app/api')
+    const doctorWallet = new HTTPWalletJSON('https://prescription.vercel.app', 'https://prescription.vercel.app/api')
     const { publicKey: doctorPublicKey } = await doctorWallet.getPublicKey({ identityKey: true })
     
     let wallet: WalletInterface
