@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Natural Chain",
-  description: "Tracking natural gas from wellhead to LNG export",
+  title: "Prescription Tokens",
+  description: "Tracking prescriptions from creation to fulfillment",
 };
 
 export default function RootLayout({
