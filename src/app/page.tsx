@@ -213,7 +213,7 @@ const App: React.FC = () => {
   async function createTokenOnBSV(data: DataEntry, step: string, spend?: QueueEntry | null): Promise<{ txid: string, arc: unknown }> {
     const patientWallet = new WalletClient('json-api', 'prescriptions.vercel.app')
     const { publicKey: patientPublicKey } = await patientWallet.getPublicKey({ identityKey: true })
-    const doctorWallet = new HTTPWalletJSON('https://prescription.vercel.app', 'https://prescription.vercel.app/api')
+    const doctorWallet = new HTTPWalletJSON('https://prescription-tokens.vercel.app', 'https://prescription-tokens.vercel.app/api')
     const { publicKey: doctorPublicKey } = await doctorWallet.getPublicKey({ identityKey: true })
     
     let wallet: WalletInterface
