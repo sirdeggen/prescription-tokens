@@ -1,0 +1,170 @@
+[
+  {
+    "patient": {
+      "patientId": "P12345678",
+      "name": "John Smith",
+      "dateOfBirth": "1985-06-12"
+    },
+    "prescriber": {
+      "prescriberNPI": "1234567890",
+      "name": "Dr. Sarah Johnson",
+      "clinic": "City Medical Center"
+    },
+    "medication": {
+      "medicationName": "Lisinopril",
+      "ndc": "12345-6789-01",
+      "dosage": "10mg",
+      "quantity": 30,
+      "refills": 2,
+      "instructions": "Take one tablet by mouth daily",
+      "expirationDate": "2024-12-31"
+    }
+  },
+  {
+    "patient": {
+      "patientId": "P87654321",
+      "name": "Emily Johnson",
+      "dateOfBirth": "1992-03-25"
+    },
+    "prescriber": {
+      "prescriberNPI": "0987654321",
+      "name": "Dr. Michael Chen",
+      "clinic": "Westside Family Practice"
+    },
+    "medication": {
+      "medicationName": "Atorvastatin",
+      "ndc": "98765-4321-02",
+      "dosage": "20mg",
+      "quantity": 90,
+      "refills": 3,
+      "instructions": "Take one tablet by mouth at bedtime",
+      "expirationDate": "2025-01-15"
+    }
+  },
+  {
+    "patient": {
+      "patientId": "P24681357",
+      "name": "Robert Williams",
+      "dateOfBirth": "1978-11-30"
+    },
+    "prescriber": {
+      "prescriberNPI": "2468135790",
+      "name": "Dr. Lisa Martinez",
+      "clinic": "Downtown Health Associates"
+    },
+    "medication": {
+      "medicationName": "Metformin",
+      "ndc": "24680-1357-03",
+      "dosage": "500mg",
+      "quantity": 60,
+      "refills": 5,
+      "instructions": "Take one tablet twice daily with meals",
+      "expirationDate": "2024-10-15"
+    }
+  },
+  {
+    "patient": {
+      "patientId": "P13579246",
+      "name": "Sarah Thompson",
+      "dateOfBirth": "1985-07-12"
+    },
+    "prescriber": {
+      "prescriberNPI": "1357924680",
+      "name": "Dr. James Wilson",
+      "clinic": "Eastside Medical Center"
+    },
+    "medication": {
+      "medicationName": "Lisinopril",
+      "ndc": "13579-2468-01",
+      "dosage": "10mg",
+      "quantity": 30,
+      "refills": 2,
+      "instructions": "Take one tablet daily in the morning",
+      "expirationDate": "2024-12-20"
+    }
+  },
+  {
+    "patient": {
+      "patientId": "P97531086",
+      "name": "David Garcia",
+      "dateOfBirth": "1973-04-18"
+    },
+    "prescriber": {
+      "prescriberNPI": "9753108642",
+      "name": "Dr. Jennifer Smith",
+      "clinic": "Riverside Health Group"
+    },
+    "medication": {
+      "medicationName": "Sertraline",
+      "ndc": "97531-0864-04",
+      "dosage": "50mg",
+      "quantity": 30,
+      "refills": 5,
+      "instructions": "Take one tablet daily with or without food",
+      "expirationDate": "2025-03-10"
+    }
+  },
+  {
+    "patient": {
+      "patientId": "P36925814",
+      "name": "Jessica Brown",
+      "dateOfBirth": "1990-09-05"
+    },
+    "prescriber": {
+      "prescriberNPI": "3692581470",
+      "name": "Dr. Robert Taylor",
+      "clinic": "Central Medical Associates"
+    },
+    "medication": {
+      "medicationName": "Levothyroxine",
+      "ndc": "36925-8147-02",
+      "dosage": "75mcg",
+      "quantity": 90,
+      "refills": 3,
+      "instructions": "Take one tablet daily on an empty stomach",
+      "expirationDate": "2025-02-28"
+    }
+  },
+  {
+    "patient": {
+      "patientId": "P80246913",
+      "name": "Michael Anderson",
+      "dateOfBirth": "1968-12-03"
+    },
+    "prescriber": {
+      "prescriberNPI": "8024691357",
+      "name": "Dr. Sarah Johnson",
+      "clinic": "Valley Primary Care"
+    },
+    "medication": {
+      "medicationName": "Amlodipine",
+      "ndc": "80246-9135-01",
+      "dosage": "5mg",
+      "quantity": 30,
+      "refills": 6,
+      "instructions": "Take one tablet daily in the evening",
+      "expirationDate": "2024-11-15"
+    }
+  },
+  {
+    "patient": {
+      "patientId": "P15948732",
+      "name": "Amanda Wilson",
+      "dateOfBirth": "1982-05-20"
+    },
+    "prescriber": {
+      "prescriberNPI": "1594873260",
+      "name": "Dr. Thomas Lee",
+      "clinic": "Harbor Family Medicine"
+    },
+    "medication": {
+      "medicationName": "Escitalopram",
+      "ndc": "15948-7326-03",
+      "dosage": "10mg",
+      "quantity": 30,
+      "refills": 2,
+      "instructions": "Take one tablet daily at the same time each day",
+      "expirationDate": "2025-04-10"
+    }
+  }
+]

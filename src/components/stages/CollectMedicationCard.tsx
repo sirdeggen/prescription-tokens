@@ -1,11 +1,10 @@
 "use client"
 import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
-import { DataEntry } from '../../app/page';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
 
 interface CollectMedicationCardProps {
-  onSubmit: (step: string, data: DataEntry | undefined) => void;
+  onSubmit: (step: string) => void;
 }
 
 const CollectMedicationCard: React.FC<CollectMedicationCardProps> = ({ onSubmit }) => {
@@ -15,7 +14,7 @@ const CollectMedicationCard: React.FC<CollectMedicationCardProps> = ({ onSubmit 
       boxShadow: '0 4px 12px rgba(44, 110, 142, 0.2)',
       borderTop: '4px solid #4b9aaa',
     }}>
-      <CardActionArea onClick={() => onSubmit('Collect Medication', undefined)}>
+      <CardActionArea onClick={() => onSubmit('Collect Medication')}>
         <CardMedia
           component="img"
           image="/images/medication.png"

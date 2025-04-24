@@ -18,7 +18,8 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
   const [arcData, setArcData] = useState<ArcResponse | null>(null)
 
   const getStatus = async () => {
-    const res = await (await fetch('https://arc.taal.com/v1/tx/' + startingData?.txid)).json()
+    if (!startingData?.txid) return;
+    const res = await (await fetch('https://arc.taal.com/v1/tx/' + startingData.txid)).json()
     setArcData(res)
   }
 
@@ -68,14 +69,14 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
         height: 'auto', 
         borderRadius: 2, 
         p: 3, 
-        backgroundColor: entry.txid ? '#eef7fa' : '#f8f8f8',
-        borderLeft: entry.txid ? '4px solid #2c6e8e' : '4px solid #ccc'
+        backgroundColor: entry?.txid ? '#eef7fa' : '#f8f8f8',
+        borderLeft: entry?.txid ? '4px solid #2c6e8e' : '4px solid #ccc'
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <LocalHospitalIcon sx={{ mr: 1, color: '#2c6e8e' }} />
         <Typography variant="h6" sx={{ color: '#2c6e8e', fontWeight: 600 }}>
-          {startingData.step} Record
+          {startingData?.step || 'Prescription'} Record
         </Typography>
         <Box sx={{ flexGrow: 1 }}></Box>
         <IconButton 
@@ -89,7 +90,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
       
       <Divider sx={{ mb: 2 }} />
       
-      {entry && (
+      {entry && startingData.data && (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {startingData.data.patient && (
             <Box sx={{ mb: 2 }}>
@@ -170,16 +171,20 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
           )}
           
           <Box sx={{ mt: 1 }}>
-            <Chip 
-              size="small" 
-              label={`Timestamp: ${entry.timestamp}`} 
-              sx={{ backgroundColor: '#e1f0f5', color: '#4b9aaa', mb: 1, mr: 1 }} 
-            />
-            <Chip 
-              size="small" 
-              label={`Entry ID: ${entry.entryId}`} 
-              sx={{ backgroundColor: '#e1f0f5', color: '#4b9aaa', mb: 1 }} 
-            />
+            {startingData.data.timestamp && (
+              <Chip 
+                size="small" 
+                label={`Timestamp: ${startingData.data.timestamp}`} 
+                sx={{ backgroundColor: '#e1f0f5', color: '#4b9aaa', mb: 1, mr: 1 }} 
+              />
+            )}
+            {startingData.data.entryId && (
+              <Chip 
+                size="small" 
+                label={`Entry ID: ${startingData.data.entryId}`} 
+                sx={{ backgroundColor: '#e1f0f5', color: '#4b9aaa', mb: 1 }} 
+              />
+            )}
           </Box>
         </Box>
       )}
@@ -196,7 +201,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
         </Box>
       )}
       
-      {entry.txid && arcData && arcData.txStatus === 'MINED' && (
+      {entry?.txid && arcData && arcData.txStatus === 'MINED' && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
           <IconButton 
             onClick={(e) => {

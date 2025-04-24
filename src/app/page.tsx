@@ -4,9 +4,10 @@ import { Container, Typography, Box, CircularProgress, Backdrop } from '@mui/mat
 import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
 import CollectMedicationCard from '../components/stages/CollectMedicationCard'
 import ResultBox from '../components/ResultBox';
-import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WhatsOnChain, WalletInterface, WalletClient, CreateActionOutput } from '@bsv/sdk'
+import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WhatsOnChain, WalletInterface, WalletClient, CreateActionOutput, LockingScript } from '@bsv/sdk'
 import SubmissionsLog from '@/components/SubmissionsLog';
 import { saveSubmission, getAllSubmissions } from '@/utils/db';
+import prescriptions from '@/utils/prescriptions.json';
 
 export interface DataEntry {
   entryId: string;
@@ -112,27 +113,26 @@ const App: React.FC = () => {
 
   useEffect(() => {
     loadSubmissions();
-  });
+  }, []);
 
   const grabTokenFromPreviousStep = async (step: string) => {
-    switch (step) {
-        case 'Create Prescription':
-          return undefined
-        case 'Collect Medication':
-          return createPrescriptionQueue[0]
-      }
+    if (step === 'Collect Medication') {
+      return createPrescriptionQueue[0]
+    }
+    return undefined
   }
 
-  const handleSubmitData = async (step: string, d: DataEntry | undefined) => {
+  const handleSubmitData = async (step: string) => {
     try {
       setIsSubmitting(true);
       setSubmittingStep(step);
       
-      if (d) {
+      let d: DataEntry
+      if (step === 'Create Prescription') {
+        d = simulatedData()
         const entryId = Utils.toBase64(Random(8))
         d.entryId = entryId
         d.timestamp = new Date().toISOString()
-        d = simulatedData(d)
       } else {
         d = {
           entryId: Utils.toBase64(Random(8)),
@@ -180,26 +180,8 @@ const App: React.FC = () => {
    * @param data The example data to be varied
    * @returns The simulated data
    */
-  function simulatedData(data: DataEntry): DataEntry {
-    for (const key in data) {
-      const value = data[key];
-      if (typeof value === 'number') {
-        const variance = value * 0.1; // 10% of the value
-        const randomFactor = Math.random() * 2 - 1; // Random value between -1 and 1
-        data[key] = (value + (variance * randomFactor)) as number;
-      } else if (typeof value === 'object' && value !== null) {
-        const nested = value as Record<string, number>;
-        for (const nestedKey in nested) {
-          const nestedVal = nested[nestedKey];
-          if (typeof nestedVal === 'number') {
-            const nestedVariance = nestedVal * 0.1;
-            const nestedRandomFactor = Math.random() * 2 - 1;
-            nested[nestedKey] = (nestedVal + (nestedVariance * nestedRandomFactor)) as number;
-          }
-        }
-      }
-    }
-    return data
+  function simulatedData(): DataEntry {
+    return prescriptions[Math.floor(Math.random() * prescriptions.length)] as DataEntry
   }
 
   /**
@@ -213,7 +195,7 @@ const App: React.FC = () => {
   async function createTokenOnBSV(data: DataEntry, step: string, spend?: QueueEntry | null): Promise<{ txid: string, arc: unknown }> {
     const patientWallet = new WalletClient('json-api', 'prescriptions.vercel.app')
     const { publicKey: patientPublicKey } = await patientWallet.getPublicKey({ identityKey: true })
-    const doctorWallet = new HTTPWalletJSON('https://prescription-tokens.vercel.app', 'https://prescription-tokens.vercel.app/api')
+    const doctorWallet = new HTTPWalletJSON('https://prescription-tokens.vercel.app', 'http://localhost:3000/api')
     const { publicKey: doctorPublicKey } = await doctorWallet.getPublicKey({ identityKey: true })
     
     let wallet: WalletInterface
@@ -262,8 +244,8 @@ const App: React.FC = () => {
           const unlockingScriptTemplate = pushdrop.unlock(
             customInstructions.protocolID,
             customInstructions.keyID,
-            customInstructions.counterparty,
-            'none',
+            counterparty,
+            'all',
             true,
             1,
             sourceTransaction.outputs[vout].lockingScript
@@ -274,15 +256,18 @@ const App: React.FC = () => {
             sourceOutputIndex: vout,
             unlockingScriptTemplate
           })
-
+          txDummy.addOutput({
+            lockingScript: LockingScript.fromASM('OP_FALSE OP_RETURN'),
+            satoshis: 0,
+          })
           await txDummy.sign()
+          console.log({ txDummy: txDummy.toHex() })
           if (!inputs) {
             inputs = []
           }
           const nb = new Beef()
           nb.mergeTransaction(sourceTransaction)
           console.log(nb.toLogString())
-          console.log(await nb.verify(new WhatsOnChain()))
           inputBEEF = nb.toBinary()
           inputs.push({
             unlockingScript: txDummy.inputs[0].unlockingScript?.toHex() as string,
@@ -339,62 +324,17 @@ const App: React.FC = () => {
       }
     }))
     console.log({ arc })
+    console.log({ inputs })
     if (step !== 'Create Prescription') {
+      const output = inputs?.[0].outpoint as string
+      console.log({ output })
       await doctorWallet.relinquishOutput({
         basket: 'prescription',
-        output: inputs?.[0].outpoint as string
+        output
       })
     }
     return { txid: res.txid as string, arc }
   }
-
-  const simulateData = {
-    createPrescription: {
-      entryId: 'rx-001234567',
-      timestamp: new Date().toISOString(),
-      patient: { 
-        patientId: 'PT10987654',
-        name: 'Jane Smith',
-        dateOfBirth: '1985-06-15'
-      },
-      prescriber: { 
-        prescriberNPI: '1234567890', 
-        name: 'Dr. Robert Johnson',
-        clinic: 'City Medical Center'
-      },
-      medication: {
-        medicationName: 'Amoxicillin',
-        ndc: '76329-3030-01',
-        dosage: '500mg',
-        quantity: 30,
-        refills: 0,
-        instructions: 'Take 1 capsule by mouth 3 times daily for 10 days',
-        expirationDate: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0] // 30 days from now
-      }
-    },
-    collectMedication: {
-      entryId: 'rx-fill-987654321',
-      timestamp: new Date().toISOString(),
-      patient: { 
-        patientId: 'PT10987654', 
-        name: 'Jane Smith',
-        dateOfBirth: '1985-06-15'
-      },
-      pharmacy: {
-        pharmacyNPI: '9876543210',
-        name: 'Main Street Pharmacy',
-        pharmacist: 'Lisa Chen, PharmD',
-        dispensedDate: new Date().toISOString().split('T')[0]
-      },
-      medication: {
-        medicationName: 'Amoxicillin',
-        ndc: '76329-3030-01',
-        dosage: '500mg',
-        quantity: 30,
-        instructions: 'Take 1 capsule by mouth 3 times daily for 10 days'
-      }
-    }
-  };
 
   const boxSx = {
     display: 'flex',
@@ -410,7 +350,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, minHeight: '100vh', display: 'flex', flexDirection: 'column', pt: 10, pb: 40, bgcolor: '#f8fbfd',  }}>
+    <Container maxWidth="lg" sx={{ mt: 4, minHeight: '100vh', display: 'flex', flexDirection: 'column', pt: 10, pb: 40, bgcolor: '#f8fbfd' }}>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={isSubmitting}
@@ -434,7 +374,7 @@ const App: React.FC = () => {
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><CreatePrescriptionCard data={simulateData.createPrescription} onSubmit={handleSubmitData} /></Box>
+          <Box sx={cardSx}><CreatePrescriptionCard onSubmit={handleSubmitData} /></Box>
           <ResultBox entry={createPrescriptionQueue[createPrescriptionQueue.length - 1]} />
         </Box>
         <Box sx={boxSx}>
