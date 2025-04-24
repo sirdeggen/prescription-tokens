@@ -5,18 +5,17 @@ import { DataEntry } from '../../app/page';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
 
 interface CollectMedicationCardProps {
-  data: DataEntry;
-  onSubmit: (step: string, data: DataEntry) => void;
+  onSubmit: (step: string, data: DataEntry | undefined) => void;
 }
 
-const CollectMedicationCard: React.FC<CollectMedicationCardProps> = ({ data, onSubmit }) => {
+const CollectMedicationCard: React.FC<CollectMedicationCardProps> = ({ onSubmit }) => {
   return (
     <Card sx={{
       ...cardContainerSx,
       boxShadow: '0 4px 12px rgba(44, 110, 142, 0.2)',
       borderTop: '4px solid #4b9aaa',
     }}>
-      <CardActionArea onClick={() => onSubmit('Collect Medication', data)}>
+      <CardActionArea onClick={() => onSubmit('Collect Medication', undefined)}>
         <CardMedia
           component="img"
           image="/images/medication.png"

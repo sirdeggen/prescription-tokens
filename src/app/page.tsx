@@ -123,15 +123,25 @@ const App: React.FC = () => {
       }
   }
 
-  const handleSubmitData = async (step: string, data: DataEntry) => {
+  const handleSubmitData = async (step: string, d: DataEntry | undefined) => {
     try {
       setIsSubmitting(true);
       setSubmittingStep(step);
       
-      const entryId = Utils.toBase64(Random(8))
-      data.entryId = entryId
-      data.timestamp = new Date().toISOString()
-      data = simulatedData(data)
+      if (d) {
+        const entryId = Utils.toBase64(Random(8))
+        d.entryId = entryId
+        d.timestamp = new Date().toISOString()
+        d = simulatedData(d)
+      } else {
+        d = {
+          entryId: Utils.toBase64(Random(8)),
+          timestamp: new Date().toISOString()
+        }
+      }
+
+      const data: DataEntry = d
+      
 
       const spend = await grabTokenFromPreviousStep(step)
 
@@ -219,6 +229,7 @@ const App: React.FC = () => {
     let outputs: CreateActionOutput[] | undefined = undefined
     let inputs: CreateActionInput[] | undefined = undefined
     let inputBEEF: BEEF | undefined = undefined
+    const pushdrop = new PushDrop(wallet)
     if (spend) {
       const sha = Hash.sha256(JSON.stringify(spend.data))
       const customInstructions = {
@@ -252,7 +263,7 @@ const App: React.FC = () => {
             customInstructions.protocolID,
             customInstructions.keyID,
             customInstructions.counterparty,
-            'single',
+            'none',
             true,
             1,
             sourceTransaction.outputs[vout].lockingScript
@@ -264,10 +275,6 @@ const App: React.FC = () => {
             unlockingScriptTemplate
           })
 
-          txDummy.addOutput({
-            lockingScript,
-            satoshis: 1,
-          })
           await txDummy.sign()
           if (!inputs) {
             inputs = []
@@ -290,7 +297,6 @@ const App: React.FC = () => {
       const shasha = Hash.sha256(sha)
 
       // Create a new pushdrop token
-      const pushdrop = new PushDrop(wallet)
       const customInstructions = {
           protocolID: [0, 'medical prescription'] as WalletProtocol,
           keyID: Utils.toBase64(sha),
@@ -432,7 +438,7 @@ const App: React.FC = () => {
           <ResultBox entry={createPrescriptionQueue[createPrescriptionQueue.length - 1]} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><CollectMedicationCard data={simulateData.collectMedication} onSubmit={handleSubmitData} /></Box>
+          <Box sx={cardSx}><CollectMedicationCard onSubmit={handleSubmitData} /></Box>
           <ResultBox entry={collectMedicationQueue[collectMedicationQueue.length - 1]} />
         </Box>
       </Box>
