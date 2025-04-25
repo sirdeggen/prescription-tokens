@@ -77,23 +77,28 @@ const App: React.FC = () => {
       },
       body: JSON.stringify({ txsIds })
     })).json()
+    console.log({bitails})
     const unspentSubmissions = submissions.filter(s => {
-      const tx = bitails.find(b => b.txid === s.txid)
-      return tx?.outputs[0].spent === ''
+      const tx = bitails.find(b => b?.txid === s.txid)
+      console.log({ s: s.txid, spent: !!tx?.outputs[0].spent })
+      return !tx?.outputs[0].spent
     })
+    const prescriptionQueue: QueueEntry[] = []
+    const collectMedicationQueue: QueueEntry[] = []
     if (unspentSubmissions.length > 0) {
       // add unspent tokens to the appropriate queue
       unspentSubmissions.forEach(token => {
         switch (token.step) {
           case 'Create Prescription':
-            setCreatePrescriptionQueue((prev) => [...prev, token])
+            prescriptionQueue.push(token)
             break
           case 'Collect Medication':
-            setCollectMedicationQueue((prev) => [...prev, token])
+            collectMedicationQueue.push(token)
             break
         }
       })
     }
+    return { prescriptionQueue, collectMedicationQueue }
   }
 
   // Load submissions from IndexedDB
@@ -102,8 +107,10 @@ const App: React.FC = () => {
       const submissions = await getAllSubmissions();
       if (submissions && submissions.length > 0) {
         // check for unspent tokens:
+        const { prescriptionQueue, collectMedicationQueue } = await checkUnspentSetQueues(submissions)
         setSubmissions(submissions);          
-        await checkUnspentSetQueues(submissions)
+        setCreatePrescriptionQueue(prescriptionQueue)
+        setCollectMedicationQueue(collectMedicationQueue)
       }
     } catch (error) {
       console.error('Failed to load submissions from IndexedDB:', error);
