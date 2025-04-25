@@ -196,12 +196,12 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
             Blockchain Verification
           </Typography>
           <Typography variant="body2" sx={{ color: '#555' }}>
-            Status: {arcData.txStatus}
+            Status: {arcData?.txStatus ?? 'The Demo Gods Have Rejected This Transaction'}
           </Typography>
         </Box>
       )}
       
-      {entry?.txid && arcData && arcData.txStatus === 'MINED' && (
+      {entry?.txid && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
           <IconButton 
             onClick={(e) => {

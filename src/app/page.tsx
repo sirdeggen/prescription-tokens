@@ -218,7 +218,7 @@ const App: React.FC = () => {
     let outputs: CreateActionOutput[] | undefined = undefined
     let inputs: CreateActionInput[] | undefined = undefined
     let inputBEEF: BEEF | undefined = undefined
-    const pushdrop = new PushDrop(wallet)
+    const pushdrop = new PushDrop(wallet, 'https://prescription-tokens.vercel.app')
     if (spend) {
       const sha = Hash.sha256(JSON.stringify(spend.data))
       const customInstructions = {
@@ -237,15 +237,20 @@ const App: React.FC = () => {
 
       const beef = Beef.fromBinary(tokens.BEEF as number[])
 
+      console.log(beef.toLogString())
+
       if (tokens.totalOutputs > 0) {
         // pick the output to spend based on available tokens matching this keyID
         const output = tokens.outputs.find(output => {
           const c = JSON.parse(output.customInstructions as string)
+          console.log({ c, customInstructions })
           return customInstructions.keyID === c.keyID
         })
+        console.log({ output })
         if (output) {
           const [txid, voutStr] = output.outpoint.split('.')
           const vout = parseInt(voutStr)
+          console.log({ txid, vout })
           const sourceTransaction = beef.findAtomicTransaction(txid) as Transaction
           // Spend the current state of the token to create an immutable chain of custody
           const unlockingScriptTemplate = pushdrop.unlock(
@@ -314,7 +319,7 @@ const App: React.FC = () => {
         basket: 'prescription'
       }]
     }
-
+    
     const res = await wallet.createAction({
       inputBEEF,
       description: 'Tracking the creation and fullfilment of a prescription',
@@ -332,14 +337,14 @@ const App: React.FC = () => {
     }))
     console.log({ arc })
     console.log({ inputs })
-    if (step !== 'Create Prescription') {
-      const output = inputs?.[0].outpoint as string
-      console.log({ output })
-      await doctorWallet.relinquishOutput({
-        basket: 'prescription',
-        output
-      })
-    }
+    // if (step !== 'Create Prescription') {
+    //   const output = inputs?.[0].outpoint as string
+    //   console.log({ output })
+    //   await doctorWallet.relinquishOutput({
+    //     basket: 'prescription',
+    //     output
+    //   })
+    // }
     return { txid: res.txid as string, arc }
   }
 

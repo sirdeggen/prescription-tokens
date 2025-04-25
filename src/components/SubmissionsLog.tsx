@@ -92,9 +92,9 @@ const SubmissionsLog: React.FC<{ submissions: Submission[] }> = ({ submissions }
                   </Box>
                 )}
                 {entry.txid && (
-                  <Box sx={{ textAlign: 'right', maxWidth: '100px' }}>
+                  <Box sx={{ textAlign: 'right', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     <Typography variant="caption" sx={{ color: '#607d8b' }}>
-                      {entry.txid.substring(0, 8)}...
+                      {entry.txid}
                     </Typography>
                   </Box>
                 )}
