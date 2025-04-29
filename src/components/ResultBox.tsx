@@ -1,10 +1,10 @@
 "use client"
 import React, { useState } from 'react';
-import { Box, IconButton, Typography, Paper, Divider, Chip } from '@mui/material';
+import { Box, IconButton, Typography, Paper, Divider } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
-import { Token } from '../app/page';
+import { Token } from '../components/types';
 
 interface ResultBoxProps {
   entry: Token | null,
@@ -102,9 +102,17 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
               </Typography>
             </Box>
           ))}
+          {startingData.txid && <Box key={startingData.txid} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="subtitle2" sx={{ color: '#2c6e8e', fontWeight: 600, mb: 0.5 }}>
+              txid
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#555', overflow: 'hidden', textOverflow: 'ellipsis'  }}>
+              {startingData.txid}
+            </Typography>
+          </Box>}
         </Box>
       )}
-      
+    
       {arcData && (
         <Box sx={{ mt: 2 }}>
           <Divider sx={{ mb: 2 }} />
@@ -112,7 +120,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
             Verificación en Blockchain
           </Typography>
           <Typography variant="body2" sx={{ color: '#555' }}>
-            Estado: {arcData?.txStatus ?? 'Los Dioses Demo han rechazado esta transacción'}
+            Estado: {!arcData?.txStatus ? 'Todav a no ha sido difundido' : arcData?.txStatus}
           </Typography>
         </Box>
       )}

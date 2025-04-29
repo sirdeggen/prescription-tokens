@@ -3,10 +3,10 @@ import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
 import { DataEntry, Token } from '../types';
-import { doctor, patient } from '@/utils/wallets';
+import { doctor, patientIdentityKey } from '@/utils/wallets';
 import { saveSubmission } from '@/utils/db';
 import prescriptions from '@/utils/prescriptions.json';
-import { Utils, PushDrop, Random, Transaction, CreateActionOutput, Hash } from '@bsv/sdk'
+import { Utils, PushDrop, Random, CreateActionOutput, Hash } from '@bsv/sdk'
 
 interface CreatePrescriptionCardProps {
   setPrescription: (token: Token) => void;
@@ -42,8 +42,6 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPres
       const prescriptionData = simulateData()
       const jsonBlob = Utils.toArray(JSON.stringify(prescriptionData), 'utf8')
       const documentHash = Hash.sha256(jsonBlob)
-
-      const { publicKey: patientIdentityKey } = await patient.getPublicKey({ identityKey: true })
       
       const lockingScript = await pushdrop.lock(
         [documentHash],
@@ -70,7 +68,9 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPres
       const token: Token = {
         data: prescriptionData,
         txid: action.txid as string,
-        tx: Transaction.fromBEEF(action.tx as number[])
+        tx: action.tx as number[],
+        status: 'created',
+        spent: false
       }
 
       setPrescription(token)
@@ -90,7 +90,7 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPres
       boxShadow: '0 4px 12px rgba(44, 110, 142, 0.2)',
       borderTop: '4px solid #2c6e8e',
     }}>
-      <CardActionArea onClick={() => onSubmit('Create Prescription')}>
+      <CardActionArea onClick={doctorCreatesPrescription}>
         <CardMedia
           component="img"
           image="/images/prescription.png"

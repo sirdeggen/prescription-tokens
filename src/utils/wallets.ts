@@ -6,6 +6,10 @@ const patientKey = process.env.NEXT_PUBLIC_PATIENT_KEY!
 const pharmacyKey = process.env.NEXT_PUBLIC_PHARMACY_KEY!
 const walletStorageUrl = process.env.NEXT_PUBLIC_WALLET_STORAGE_URL!
 
+export const doctorIdentityKey = PrivateKey.fromHex(doctorKey).toPublicKey().toString()
+export const patientIdentityKey = PrivateKey.fromHex(patientKey).toPublicKey().toString()
+export const pharmacyIdentityKey = PrivateKey.fromHex(pharmacyKey).toPublicKey().toString()
+
 export const createWalletClient = async (): Promise<WalletClient> => {
     const rootKey = PrivateKey.fromHex(doctorKey)
     const keyDeriver = new KeyDeriver(rootKey)

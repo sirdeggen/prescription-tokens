@@ -1,17 +1,44 @@
 "use client"
-import { Drawer, Paper, Typography, Stack, Box, Chip, Divider } from '@mui/material';
+import { Drawer, Paper, Typography, Stack, Box, Divider, IconButton } from '@mui/material';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import { getAllSubmissions } from '../utils/db';
 import { useEffect, useState } from 'react';
-import { Token } from '../app/page';
+import LinkIcon from '@mui/icons-material/Link';
+import { Token } from '../components/types';
 
-const SubmissionsLog: React.FC<{ change: boolean, setPrescription: (token: Token | null) => void }> = ({ change, setPrescription }) => {
+interface SubmissionLogProps { 
+  change: boolean; 
+  setPrescription: (token: Token | null) => void;
+  setPresentation: (token: Token | null) => void;
+  setDispensation: (token: Token | null) => void;
+  setAcknowledgement: (token: Token | null) => void;
+}
+
+const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription, setPresentation, setDispensation, setAcknowledgement }) => {
   const [tokens, setTokens] = useState<Token[]>([])
 
   useEffect(() => {
     if (!change) getAllSubmissions().then(tokens => {
       setTokens(tokens)
-      setPrescription(tokens[tokens.length - 1])
+      tokens.forEach(token => {
+        if (token.spent) return
+        switch (token.status) {
+          case 'created':
+            setPrescription(token)
+            break;
+          case 'presented':
+            setPresentation(token)
+            break;
+          case 'dispensed':
+            setDispensation(token)
+            break;
+          case 'acknowledged':
+            setAcknowledgement(token)
+            break;
+          default:
+            console.log({ unknownToken: token })
+        }
+      })
     })
   }, [change])
 
@@ -57,9 +84,8 @@ const SubmissionsLog: React.FC<{ change: boolean, setPrescription: (token: Token
             new Date(a.data.timestamp || 0).getTime()
           )
           .map((entry) => {
-            // Determine what kind of data to display based on the step
-            // Display patient name and medication details
-            let displayText = `${entry.data.paciente?.nombre ?? 'Paciente'}: ${entry.data.medicamento?.nombreMedicamento ?? ''} ${entry.data.medicamento?.dosis ?? ''} | ${entry.data.medicamento?.cantidad ?? ''} unidades`;
+            // displayText ought to be the id of the prescription data.id and the timestamp in Locale format
+            let displayText = `${entry.data.status} - ${entry.data.id} - ${new Date(entry.data.timestamp).toLocaleString()}`
             
             return (
               <Stack
@@ -89,11 +115,21 @@ const SubmissionsLog: React.FC<{ change: boolean, setPrescription: (token: Token
                   </Box>
                 )}
                 {entry.txid && (
-                  <Box sx={{ textAlign: 'right', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <><Box sx={{ textAlign: 'right', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     <Typography variant="caption" sx={{ color: '#607d8b' }}>
                       {entry.txid}
                     </Typography>
                   </Box>
+                  <IconButton
+                    href={`https://whatsonchain.com/tx/${entry.txid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="open in whatsonchain"
+                    size="small"
+                  >
+                    <LinkIcon fontSize="small" sx={{ color: '#607d8b' }} />
+                  </IconButton>
+                  </>
                 )}
               </Stack>
             );

@@ -1,5 +1,3 @@
-import { Transaction } from "@bsv/sdk";
-
 export interface DataEntry {
   paciente?: {
     idPaciente: string;
@@ -34,7 +32,9 @@ export interface DataEntry {
 export interface Token {
   data: DataEntry;
   txid: string;
-  tx: Transaction;
+  tx: number[];
+  status: 'created' | 'presented' | 'dispensed' | 'acknowledged';
+  spent: boolean;
 }
 
 export interface Submission {

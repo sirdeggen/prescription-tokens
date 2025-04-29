@@ -58,19 +58,25 @@ const App: React.FC = () => {
           <ResultBox entry={prescription} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><PresentPrescriptionCard setPresentation={setPresentation} setIsSubmitting={setIsSubmitting} /></Box>
+          <Box sx={cardSx}><PresentPrescriptionCard prescription={prescription} setPrescription={setPrescription} setPresentation={setPresentation} setIsSubmitting={setIsSubmitting} /></Box>
           <ResultBox entry={presentation} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><DispensePrescriptionCard setDispensation={setDispensation} setIsSubmitting={setIsSubmitting} /></Box>
+          <Box sx={cardSx}><DispensePrescriptionCard presentation={presentation} setPresentation={setPresentation} setDispensation={setDispensation} setIsSubmitting={setIsSubmitting} /></Box>
           <ResultBox entry={dispensation} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><AcknowledgeReceiptCard setAcknowledgement={setAcknowledgement} setIsSubmitting={setIsSubmitting} /></Box>
+          <Box sx={cardSx}><AcknowledgeReceiptCard dispensation={dispensation} setDispensation={setDispensation} setAcknowledgement={setAcknowledgement} setIsSubmitting={setIsSubmitting} /></Box>
           <ResultBox entry={acknowledgement} />
         </Box>
       </Box>
-      <SubmissionsLog change={isSubmitting} setPrescription={setPrescription} />
+      <SubmissionsLog 
+        change={isSubmitting} 
+        setPrescription={setPrescription} 
+        setPresentation={setPresentation} 
+        setDispensation={setDispensation}
+        setAcknowledgement={setAcknowledgement}
+      />
     </Container>
   );
 };
