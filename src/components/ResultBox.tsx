@@ -4,10 +4,10 @@ import { Box, IconButton, Typography, Paper, Divider, Chip } from '@mui/material
 import LinkIcon from '@mui/icons-material/Link';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
-import { QueueEntry } from '../app/page';
+import { Token } from '../app/page';
 
 interface ResultBoxProps {
-  entry: QueueEntry,
+  entry: Token | null,
 }
 
 interface ArcResponse {
@@ -36,7 +36,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
     return result
   }
 
-  const entry = startingData ? flatJSON(startingData) : null;
+  const entry = startingData ? flatJSON(startingData.data) : null;
 
   if (!startingData) {
     return <Box sx={{ 
@@ -52,7 +52,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
       md: { width: '60%' },
       backgroundColor: '#f5f9fb' 
     }}>
-      <Typography variant="body1" color="#607d8b">No prescription data yet.</Typography>
+      <Typography variant="body1" color="#607d8b">Nada aún.</Typography>
     </Box>
   }
 
@@ -76,7 +76,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <LocalHospitalIcon sx={{ mr: 1, color: '#2c6e8e' }} />
         <Typography variant="h6" sx={{ color: '#2c6e8e', fontWeight: 600 }}>
-          {startingData?.step || 'Prescription'} Record
+          Registro de Receta
         </Typography>
         <Box sx={{ flexGrow: 1 }}></Box>
         <IconButton 
@@ -90,102 +90,18 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
       
       <Divider sx={{ mb: 2 }} />
       
-      {entry && startingData.data && (
+      {entry && (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {startingData.data.patient && (
-            <Box sx={{ mb: 2 }}>
+          {Object.keys(entry).map((key) => (
+            <Box key={key} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="subtitle2" sx={{ color: '#2c6e8e', fontWeight: 600, mb: 0.5 }}>
-                Patient Information
+                {key}
               </Typography>
               <Typography variant="body2" sx={{ color: '#555' }}>
-                Patient: {startingData.data.patient.name} (ID: {startingData.data.patient.patientId})
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Date of Birth: {startingData.data.patient.dateOfBirth}
+                {entry[key as keyof Token]}
               </Typography>
             </Box>
-          )}
-          
-          {startingData.data.prescriber && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: '#2c6e8e', fontWeight: 600, mb: 0.5 }}>
-                Prescriber Information
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Prescribed by: {startingData.data.prescriber.name}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                NPI: {startingData.data.prescriber.prescriberNPI}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Clinic: {startingData.data.prescriber.clinic}
-              </Typography>
-            </Box>
-          )}
-          
-          {startingData.data.medication && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: '#2c6e8e', fontWeight: 600, mb: 0.5 }}>
-                Medication Details
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Medication: {startingData.data.medication.medicationName} {startingData.data.medication.dosage}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                NDC: {startingData.data.medication.ndc}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Quantity: {startingData.data.medication.quantity}
-              </Typography>
-              {startingData.data.medication.refills !== undefined && (
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                  Refills: {startingData.data.medication.refills}
-                </Typography>
-              )}
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Instructions: {startingData.data.medication.instructions}
-              </Typography>
-              {startingData.data.medication.expirationDate && (
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                  Expiration: {startingData.data.medication.expirationDate}
-                </Typography>
-              )}
-            </Box>
-          )}
-          
-          {startingData.data.pharmacy && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: '#2c6e8e', fontWeight: 600, mb: 0.5 }}>
-                Pharmacy Information
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Dispensed by: {startingData.data.pharmacy.name}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Pharmacist: {startingData.data.pharmacy.pharmacist}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#555' }}>
-                Dispensed Date: {startingData.data.pharmacy.dispensedDate}
-              </Typography>
-            </Box>
-          )}
-          
-          <Box sx={{ mt: 1 }}>
-            {startingData.data.timestamp && (
-              <Chip 
-                size="small" 
-                label={`Timestamp: ${startingData.data.timestamp}`} 
-                sx={{ backgroundColor: '#e1f0f5', color: '#4b9aaa', mb: 1, mr: 1 }} 
-              />
-            )}
-            {startingData.data.entryId && (
-              <Chip 
-                size="small" 
-                label={`Entry ID: ${startingData.data.entryId}`} 
-                sx={{ backgroundColor: '#e1f0f5', color: '#4b9aaa', mb: 1 }} 
-              />
-            )}
-          </Box>
+          ))}
         </Box>
       )}
       
@@ -193,20 +109,20 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
         <Box sx={{ mt: 2 }}>
           <Divider sx={{ mb: 2 }} />
           <Typography variant="subtitle2" sx={{ color: '#2c6e8e', fontWeight: 600, mb: 0.5 }}>
-            Blockchain Verification
+            Verificación en Blockchain
           </Typography>
           <Typography variant="body2" sx={{ color: '#555' }}>
-            Status: {arcData?.txStatus ?? 'The Demo Gods Have Rejected This Transaction'}
+            Estado: {arcData?.txStatus ?? 'Los Dioses Demo han rechazado esta transacción'}
           </Typography>
         </Box>
       )}
       
-      {entry?.txid && (
+      {startingData?.txid && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
           <IconButton 
             onClick={(e) => {
               e.stopPropagation();
-              window.open(`https://whatsonchain.com/tx/${entry.txid}`, '_blank');
+              window.open(`https://whatsonchain.com/tx/${startingData.txid}`, '_blank');
             }}
             sx={{ color: '#4b9aaa' }}
           >

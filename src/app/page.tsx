@@ -1,14 +1,12 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Container, Typography, Box, CircularProgress, Backdrop } from '@mui/material';
 import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
-import CollectMedicationCard from '../components/stages/CollectMedicationCard'
 import ResultBox from '../components/ResultBox';
-import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJSON, ARC, CreateActionInput, Beef, BEEF, WalletInterface, WalletClient, CreateActionOutput, LockingScript } from '@bsv/sdk'
+import { Utils, PushDrop, Random, Transaction, CreateActionOutput, Hash } from '@bsv/sdk'
 import SubmissionsLog from '@/components/SubmissionsLog';
-import { saveSubmission, getAllSubmissions } from '@/utils/db';
+import { saveSubmission } from '@/utils/db';
 import prescriptions from '@/utils/prescriptions.json';
-import { checkUnspentSetQueues } from '@/utils/checkUnspent';
 import { doctor, patient } from '@/utils/wallets';
 
 export interface DataEntry {
@@ -57,9 +55,9 @@ export interface Submission {
 
 const App: React.FC = () => {
   const [prescription, setPrescription] = useState<Token | null>(null)
-  const [collection, setCollection] = useState<Token | null>(null)
-  const [dispensation, setDispensation] = useState<Token | null>(null)
-  const [patientAcknowledgement, setPatientAcknowledgement] = useState<Token | null>(null)
+  // const [collection, setCollection] = useState<Token | null>(null)
+  // const [dispensation, setDispensation] = useState<Token | null>(null)
+  // const [patientAcknowledgement, setPatientAcknowledgement] = useState<Token | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   
 
@@ -84,18 +82,19 @@ const App: React.FC = () => {
    * @param step The step of the process
    * @returns The transaction ID and broadcast response
    */
-  async function doctorCeatesPrescription() {
+  async function doctorCreatesPrescription() {
     try {
       setIsSubmitting(true)
       let outputs: CreateActionOutput[] | undefined = undefined
       const pushdrop = new PushDrop(doctor, 'https://prescription-tokens.vercel.app')
       const prescriptionData = simulateData()
       const jsonBlob = Utils.toArray(JSON.stringify(prescriptionData), 'utf8')
+      const documentHash = Hash.sha256(jsonBlob)
 
       const { publicKey: patientIdentityKey } = await patient.getPublicKey({ identityKey: true })
       
       const lockingScript = await pushdrop.lock(
-        [jsonBlob],
+        [documentHash],
         [0, 'medical prescription'],
         prescriptionData.id,
         patientIdentityKey,
@@ -123,7 +122,7 @@ const App: React.FC = () => {
       }
 
       setPrescription(token)
-      
+
       await saveSubmission(token)
 
     } catch (error) {
@@ -162,7 +161,7 @@ const App: React.FC = () => {
         }}>
           <CircularProgress color="primary" />
           <Typography variant="h6" sx={{ mt: 2, color: 'white' }}>
-            {submittingStep ? `Processing ${submittingStep}...` : 'Processing...'}
+            Processing...
           </Typography>
         </Box>
       </Backdrop>
@@ -171,15 +170,23 @@ const App: React.FC = () => {
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><CreatePrescriptionCard onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={createPrescriptionQueue[createPrescriptionQueue.length - 1]} />
+          <Box sx={cardSx}><CreatePrescriptionCard onSubmit={doctorCreatesPrescription} /></Box>
+          <ResultBox entry={prescription} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><CollectMedicationCard onSubmit={handleSubmitData} /></Box>
-          <ResultBox entry={collectMedicationQueue[collectMedicationQueue.length - 1]} />
+          <Box sx={cardSx}><PresentPrescriptionCard onSubmit={patientPresentsPrescription} /></Box>
+          <ResultBox entry={prescription} />
+        </Box>
+        <Box sx={boxSx}>
+          <Box sx={cardSx}><DispensePrescriptionCard onSubmit={pharmacyDispensesPrescription} /></Box>
+          <ResultBox entry={prescription} />
+        </Box>
+        <Box sx={boxSx}>
+          <Box sx={cardSx}><AcknowledgeReceiptCard onSubmit={patientAcknowledgesReceipt} /></Box>
+          <ResultBox entry={prescription} />
         </Box>
       </Box>
-      <SubmissionsLog submissions={submissions} />
+      <SubmissionsLog change={isSubmitting} setPrescription={setPrescription} />
     </Container>
   );
 };

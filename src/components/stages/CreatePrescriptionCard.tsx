@@ -26,10 +26,10 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ onSubmi
             ...cardTitleSx,
             color: '#2c6e8e'
           }}>
-            Create Prescription
+            Crear Receta
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={cardDescriptionSx}>
-            Create a new digital prescription for a patient with medication details
+            Crear una nueva receta digital para un paciente con detalles de medicamento
           </Typography>
         </CardContent>
       </CardActionArea>

@@ -1,9 +1,13 @@
-import { PrivateKey, KeyDeriver, ProtoWallet } from '@bsv/sdk'
+import { PrivateKey, KeyDeriver, ProtoWallet, WalletClient } from '@bsv/sdk'
 import { WalletStorageManager, Services, Wallet, StorageClient } from '@bsv/wallet-toolbox-client'
 
-export const createWallet = async (): Promise<Wallet> => {
-    const rootKey = PrivateKey.fromHex(process.env.DOCTOR_ROOT_KEY_HEX!)
-    const endpointUrl = process.env.WALLET_STORAGE_URL!
+const doctorKey = process.env.NEXT_PUBLIC_DOCTOR_KEY!
+const patientKey = process.env.NEXT_PUBLIC_PATIENT_KEY!
+const pharmacyKey = process.env.NEXT_PUBLIC_PHARMACY_KEY!
+const walletStorageUrl = process.env.NEXT_PUBLIC_WALLET_STORAGE_URL!
+
+export const createWalletClient = async (): Promise<WalletClient> => {
+    const rootKey = PrivateKey.fromHex(doctorKey)
     const keyDeriver = new KeyDeriver(rootKey)
     const storage = new WalletStorageManager(keyDeriver.identityKey)
     const chain = 'main'
@@ -14,18 +18,18 @@ export const createWallet = async (): Promise<Wallet> => {
         storage,
         services,
     })
-    const client = new StorageClient(wallet, endpointUrl)
+    const client = new StorageClient(wallet, walletStorageUrl)
     await storage.addWalletStorageProvider(client)
     await storage.makeAvailable()
-    return wallet
+    return new WalletClient(wallet)
 }
 
 const createLocalWallet = (owner: "patient" | "pharmacy"): ProtoWallet => {
     let rootKey: PrivateKey
     if (owner === 'patient') {
-        rootKey = PrivateKey.fromString(process.env.PATIENT_ROOT_KEY_HEX!)
+        rootKey = PrivateKey.fromHex(patientKey)
     } else if (owner === 'pharmacy') {
-        rootKey = PrivateKey.fromString(process.env.PHARMACY_ROOT_KEY_HEX!)
+        rootKey = PrivateKey.fromHex(pharmacyKey)
     } else {
         throw new Error('Unknown wallet owner')
     }
@@ -33,6 +37,6 @@ const createLocalWallet = (owner: "patient" | "pharmacy"): ProtoWallet => {
     return wallet
 }
 
-export const doctor = await createWallet()
+export const doctor = await createWalletClient()
 export const patient = createLocalWallet('patient')
 export const pharmacy = createLocalWallet('pharmacy')
