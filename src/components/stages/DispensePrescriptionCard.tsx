@@ -32,8 +32,7 @@ const DispensePrescriptionCard: React.FC<DispensePrescriptionCardProps> = ({ pre
           id,
           patientIdentityKey,
           'all', 
-          false,
-          3
+          false
         )
         tx.addInput({
           sourceTransaction,

@@ -32,8 +32,7 @@ const PresentPrescriptionCard: React.FC<PresentPrescriptionCardProps> = ({ presc
         prescriptionData.id,
         doctorIdentityKey,
         'all', 
-        false,
-        3
+        false
       )
       tx.addInput({
         sourceTransaction,
