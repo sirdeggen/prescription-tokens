@@ -8,42 +8,44 @@ import { Utils, Hash, PushDrop, WalletProtocol, Random, Transaction, HTTPWalletJ
 import SubmissionsLog from '@/components/SubmissionsLog';
 import { saveSubmission, getAllSubmissions } from '@/utils/db';
 import prescriptions from '@/utils/prescriptions.json';
+import { checkUnspentSetQueues } from '@/utils/checkUnspent';
+import { doctor, patient } from '@/utils/wallets';
 
 export interface DataEntry {
-  entryId: string;
-  timestamp: string;
-  patient?: {
-    patientId: string;
-    name: string;
-    dateOfBirth: string;
+  paciente?: {
+    idPaciente: string;
+    nombre: string;
+    fechaNacimiento: string;
   };
-  prescriber?: {
-    prescriberNPI: string;
-    name: string;
-    clinic: string;
+  prescriptor?: {
+    npiPrescriptor: string;
+    nombre: string;
+    clinica: string;
   };
-  medication?: {
-    medicationName: string;
+  medicamento?: {
+    nombreMedicamento: string;
     ndc: string;
-    dosage: string;
-    quantity: number;
-    refills: number;
-    instructions: string;
-    expirationDate: string;
+    dosis: string;
+    cantidad: number;
+    recargas: number;
+    instrucciones: string;
+    fechaVencimiento: string;
   };
-  pharmacy?: {
-    pharmacyNPI: string;
-    name: string;
-    pharmacist: string;
-    dispensedDate: string;
+  farmacia?: {
+    npiFarmacia: string;
+    nombre: string;
+    farmaceutico: string;
+    fechaDispensacion: string;
   };
+  timestamp: string;
+  id: string;
   [key: string]: unknown;
 }
 
-export interface QueueEntry {
+export interface Token {
   data: DataEntry;
   txid: string;
-  step: string;
+  tx: Transaction;
 }
 
 export interface Submission {
@@ -53,299 +55,82 @@ export interface Submission {
   arc: unknown;
 }
 
-type BitailsResponse = {
-  txid: string;
-  outputs: Array<{
-    index: number;
-    spent: string;
-  }>;
-}
-
 const App: React.FC = () => {
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [createPrescriptionQueue, setCreatePrescriptionQueue] = useState<QueueEntry[]>([]);
-  const [collectMedicationQueue, setCollectMedicationQueue] = useState<QueueEntry[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittingStep, setSubmittingStep] = useState<string | null>(null);
-
-  const checkUnspentSetQueues = async (submissions: Submission[]) => {
-    const txsIds = submissions.map(s => s.txid)
-    const bitails: BitailsResponse[] = await (await fetch('https://api.bitails.io/tx/multi', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ txsIds })
-    })).json()
-    console.log({bitails})
-    const unspentSubmissions = submissions.filter(s => {
-      const tx = bitails.find(b => b?.txid === s.txid)
-      console.log({ s: s.txid, spent: !!tx?.outputs[0].spent })
-      return !tx?.outputs[0].spent
-    })
-    const prescriptionQueue: QueueEntry[] = []
-    const collectMedicationQueue: QueueEntry[] = []
-    if (unspentSubmissions.length > 0) {
-      // add unspent tokens to the appropriate queue
-      unspentSubmissions.forEach(token => {
-        switch (token.step) {
-          case 'Create Prescription':
-            prescriptionQueue.push(token)
-            break
-          case 'Collect Medication':
-            collectMedicationQueue.push(token)
-            break
-        }
-      })
-    }
-    return { prescriptionQueue, collectMedicationQueue }
-  }
-
-  // Load submissions from IndexedDB
-  const loadSubmissions = async () => {
-    try {
-      const submissions = await getAllSubmissions();
-      if (submissions && submissions.length > 0) {
-        // check for unspent tokens:
-        const { prescriptionQueue, collectMedicationQueue } = await checkUnspentSetQueues(submissions)
-        setSubmissions(submissions);          
-        setCreatePrescriptionQueue(prescriptionQueue)
-        setCollectMedicationQueue(collectMedicationQueue)
-      }
-    } catch (error) {
-      console.error('Failed to load submissions from IndexedDB:', error);
-    }
-  };
+  const [prescription, setPrescription] = useState<Token | null>(null)
+  const [collection, setCollection] = useState<Token | null>(null)
+  const [dispensation, setDispensation] = useState<Token | null>(null)
+  const [patientAcknowledgement, setPatientAcknowledgement] = useState<Token | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
 
 
-  useEffect(() => {
-    loadSubmissions();
-  }, []);
-
-  const grabTokenFromPreviousStep = async (step: string) => {
-    if (step === 'Collect Medication') {
-      return createPrescriptionQueue[0]
-    }
-    return undefined
-  }
-
-  const handleSubmitData = async (step: string) => {
-    try {
-      setIsSubmitting(true);
-      setSubmittingStep(step);
-      
-      let d: DataEntry
-      if (step === 'Create Prescription') {
-        d = simulatedData()
-        const entryId = Utils.toBase64(Random(8))
-        d.entryId = entryId
-        d.timestamp = new Date().toISOString()
-      } else {
-        d = {
-          entryId: Utils.toBase64(Random(8)),
-          timestamp: new Date().toISOString()
-        }
-      }
-
-      const data: DataEntry = d
-      
-
-      const spend = await grabTokenFromPreviousStep(step)
-
-      const { txid, arc } = await createTokenOnBSV(data, step, spend)
-
-      const newSubmission = { step, data, txid, arc };
-      
-      // Save to IndexedDB
-      try {
-        await saveSubmission(newSubmission);
-      } catch (error) {
-        console.error('Failed to save submission to IndexedDB:', error);
-      }
-      
-      setSubmissions(prev => [...prev, newSubmission]);
-
-      switch (step) {
-        case 'Create Prescription':
-          setCreatePrescriptionQueue((prev) => [...prev, { data, txid, step }])
-          break
-        case 'Collect Medication':
-          setCollectMedicationQueue((prev) => [...prev, { data, txid, step }])
-          setCreatePrescriptionQueue((prev) => prev.slice(1))
-          break
-      }
-    } catch (error) {
-      console.error('Error submitting data:', error);
-    } finally {
-      setIsSubmitting(false);
-      setSubmittingStep(null);
-    }
-  }
 
   /**
-   * Simulates data by adding 10% random variability to numeric values in the example data
-   * @param data The example data to be varied
+   * Simulates data by picking from the example data
    * @returns The simulated data
    */
-  function simulatedData(): DataEntry {
-    return prescriptions[Math.floor(Math.random() * prescriptions.length)] as DataEntry
+  function simulateData(): DataEntry {
+    const data = prescriptions[Math.floor(Math.random() * prescriptions.length)] as DataEntry
+    data.timestamp = new Date().toISOString()
+    data.id = Utils.toBase64(Random(8))
+    return data
   }
 
   /**
-   * Uses the BSV Blockchain to create a token capturing the data as a hash, timestamping it, 
-   * and assigning ownership to the token which represents the medical prescription.
+   * Uses the BSV Blockchain to create a token capturing the data, timestamping it, 
+   * and assigning ownership to the token.
    * 
    * @param data The data to be stored
    * @param step The step of the process
    * @returns The transaction ID and broadcast response
    */
-  async function createTokenOnBSV(data: DataEntry, step: string, spend?: QueueEntry | null): Promise<{ txid: string, arc: unknown }> {
-    const patientWallet = new WalletClient('json-api', 'prescriptions.vercel.app')
-    const { publicKey: patientPublicKey } = await patientWallet.getPublicKey({ identityKey: true })
-    const doctorWallet = new HTTPWalletJSON('https://prescription-tokens.vercel.app', 'https://prescription-tokens.vercel.app/api')
-    const { publicKey: doctorPublicKey } = await doctorWallet.getPublicKey({ identityKey: true })
-    
-    let wallet: WalletInterface
-    let counterparty: string
-    if (step === 'Create Prescription') {
-      wallet = doctorWallet
-      counterparty = patientPublicKey
-    } else {
-      wallet = patientWallet
-      counterparty = doctorPublicKey
-    }
+  async function doctorCeatesPrescription() {
+    try {
+      setIsSubmitting(true)
+      let outputs: CreateActionOutput[] | undefined = undefined
+      const pushdrop = new PushDrop(doctor, 'https://prescription-tokens.vercel.app')
+      const prescriptionData = simulateData()
+      const jsonBlob = Utils.toArray(JSON.stringify(prescriptionData), 'utf8')
 
-    let outputs: CreateActionOutput[] | undefined = undefined
-    let inputs: CreateActionInput[] | undefined = undefined
-    let inputBEEF: BEEF | undefined = undefined
-    const pushdrop = new PushDrop(wallet, 'https://prescription-tokens.vercel.app')
-    if (spend) {
-      const sha = Hash.sha256(JSON.stringify(spend.data))
-      const customInstructions = {
-        protocolID: [0, 'medical prescription'] as WalletProtocol,
-        keyID: Utils.toBase64(sha),
-        counterparty
-      }
-      const tokens = await doctorWallet.listOutputs({
-        basket: 'prescription',
-        includeCustomInstructions: true,
-        include: 'entire transactions',
-        limit: 1000
-      })
-
-      console.log({ outputs: tokens.outputs })
-
-      const beef = Beef.fromBinary(tokens.BEEF as number[])
-
-      console.log(beef.toLogString())
-
-      if (tokens.totalOutputs > 0) {
-        // pick the output to spend based on available tokens matching this keyID
-        const output = tokens.outputs.find(output => {
-          const c = JSON.parse(output.customInstructions as string)
-          console.log({ c, customInstructions })
-          return customInstructions.keyID === c.keyID
-        })
-        console.log({ output })
-        if (output) {
-          const [txid, voutStr] = output.outpoint.split('.')
-          const vout = parseInt(voutStr)
-          console.log({ txid, vout })
-          const sourceTransaction = beef.findAtomicTransaction(txid) as Transaction
-          // Spend the current state of the token to create an immutable chain of custody
-          const unlockingScriptTemplate = pushdrop.unlock(
-            customInstructions.protocolID,
-            customInstructions.keyID,
-            counterparty,
-            'all',
-            true,
-            1,
-            sourceTransaction.outputs[vout].lockingScript
-          )
-          const txDummy = new Transaction()
-          txDummy.addInput({
-            sourceTransaction,
-            sourceOutputIndex: vout,
-            unlockingScriptTemplate
-          })
-          txDummy.addOutput({
-            lockingScript: LockingScript.fromASM('OP_FALSE OP_RETURN'),
-            satoshis: 0,
-          })
-          await txDummy.sign()
-          console.log({ txDummy: txDummy.toHex() })
-          if (!inputs) {
-            inputs = []
-          }
-          const nb = new Beef()
-          nb.mergeTransaction(sourceTransaction)
-          console.log(nb.toLogString())
-          inputBEEF = nb.toBinary()
-          inputs.push({
-            unlockingScript: txDummy.inputs[0].unlockingScript?.toHex() as string,
-            outpoint: output.outpoint,
-            inputDescription: 'medical prescription token'
-          })
-        }
-      }
-    } else {
-      // Create a hash of the data
-      const sha = Hash.sha256(JSON.stringify(data))
-      const shasha = Hash.sha256(sha)
-
-      // Create a new pushdrop token
-      const customInstructions = {
-          protocolID: [0, 'medical prescription'] as WalletProtocol,
-          keyID: Utils.toBase64(sha),
-          counterparty
-      }
-
-      // Create a locking script for the pushdrop token
+      const { publicKey: patientIdentityKey } = await patient.getPublicKey({ identityKey: true })
+      
       const lockingScript = await pushdrop.lock(
-        [Utils.toArray(step, 'utf8'), shasha],
-        customInstructions.protocolID,
-        customInstructions.keyID,
-        counterparty,
-        true,
+        [jsonBlob],
+        [0, 'medical prescription'],
+        prescriptionData.id,
+        patientIdentityKey,
+        false, 
         true,
         'after'
       )
 
-      outputs = [{
-        lockingScript: lockingScript.toHex(),
-        satoshis: 1,
-        outputDescription: 'medical prescription token',
-        customInstructions: JSON.stringify(customInstructions),
-        basket: 'prescription'
-      }]
+      const action = await doctor.createAction({
+        outputs: [{
+          lockingScript: lockingScript.toHex(),
+          satoshis: 3,
+          outputDescription: 'medical prescription issuance',
+        }],
+        description: 'Create prescription',
+        options: {
+          randomizeOutputs: false
+        }
+      })
+
+      const token: Token = {
+        data: prescriptionData,
+        txid: action.txid as string,
+        tx: Transaction.fromBEEF(action.tx as number[])
+      }
+
+      setPrescription(token)
+      
+      await saveSubmission(token)
+
+    } catch (error) {
+      console.error('Error creating prescription:', error)
+    } finally {
+      setIsSubmitting(false)
     }
-    
-    const res = await wallet.createAction({
-      inputBEEF,
-      description: 'Tracking the creation and fullfilment of a prescription',
-      inputs,
-      outputs,
-      options: {
-        randomizeOutputs: false
-      }
-    })
-    const tx = Transaction.fromAtomicBEEF(res.tx as number[])
-    const arc = await tx.broadcast(new ARC('https://arc.taal.com', {
-      headers: {
-        'X-WaitFor': 'SEEN_ON_NETWORK'
-      }
-    }))
-    console.log({ arc })
-    console.log({ inputs })
-    // if (step !== 'Create Prescription') {
-    //   const output = inputs?.[0].outpoint as string
-    //   console.log({ output })
-    //   await doctorWallet.relinquishOutput({
-    //     basket: 'prescription',
-    //     output
-    //   })
-    // }
-    return { txid: res.txid as string, arc }
   }
 
   const boxSx = {

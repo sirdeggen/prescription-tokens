@@ -1,8 +1,8 @@
 {
-  "name": "natural-chain",
+  "name": "prescription-tokens",
   "version": "1.0.0",
-  "description": "Natural Chain - BSV Natural Gas Supply Chain",
-  "author": "Natural Chain",
+  "description": "Prescription Tokens",
+  "author": "BSV Association",
   "license": "OpenBSV",
   "scripts": {
     "dev": "next dev --turbopack",

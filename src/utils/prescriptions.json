@@ -1,170 +1,170 @@
 [
   {
-    "patient": {
-      "patientId": "P12345678",
-      "name": "John Smith",
-      "dateOfBirth": "1985-06-12"
+    "paciente": {
+      "idPaciente": "P12345678",
+      "nombre": "Juan Pérez",
+      "fechaNacimiento": "1985-06-12"
     },
-    "prescriber": {
-      "prescriberNPI": "1234567890",
-      "name": "Dr. Sarah Johnson",
-      "clinic": "City Medical Center"
+    "prescriptor": {
+      "npiPrescriptor": "1234567890",
+      "nombre": "Dra. Sofía Rodríguez",
+      "clinica": "Centro Médico Buenos Aires"
     },
-    "medication": {
-      "medicationName": "Lisinopril",
+    "medicamento": {
+      "nombreMedicamento": "Lisinopril",
       "ndc": "12345-6789-01",
-      "dosage": "10mg",
-      "quantity": 30,
-      "refills": 2,
-      "instructions": "Take one tablet by mouth daily",
-      "expirationDate": "2024-12-31"
+      "dosis": "10mg",
+      "cantidad": 30,
+      "recargas": 2,
+      "instrucciones": "Tomar un comprimido por vía oral diariamente",
+      "fechaVencimiento": "2024-12-31"
     }
   },
   {
-    "patient": {
-      "patientId": "P87654321",
-      "name": "Emily Johnson",
-      "dateOfBirth": "1992-03-25"
+    "paciente": {
+      "idPaciente": "P87654321",
+      "nombre": "Emilia Martínez",
+      "fechaNacimiento": "1992-03-25"
     },
-    "prescriber": {
-      "prescriberNPI": "0987654321",
-      "name": "Dr. Michael Chen",
-      "clinic": "Westside Family Practice"
+    "prescriptor": {
+      "npiPrescriptor": "0987654321",
+      "nombre": "Dr. Miguel Fernández",
+      "clinica": "Consultorios Médicos Palermo"
     },
-    "medication": {
-      "medicationName": "Atorvastatin",
+    "medicamento": {
+      "nombreMedicamento": "Atorvastatina",
       "ndc": "98765-4321-02",
-      "dosage": "20mg",
-      "quantity": 90,
-      "refills": 3,
-      "instructions": "Take one tablet by mouth at bedtime",
-      "expirationDate": "2025-01-15"
+      "dosis": "20mg",
+      "cantidad": 90,
+      "recargas": 3,
+      "instrucciones": "Tomar un comprimido por vía oral antes de acostarse",
+      "fechaVencimiento": "2025-01-15"
     }
   },
   {
-    "patient": {
-      "patientId": "P24681357",
-      "name": "Robert Williams",
-      "dateOfBirth": "1978-11-30"
+    "paciente": {
+      "idPaciente": "P24681357",
+      "nombre": "Roberto González",
+      "fechaNacimiento": "1978-11-30"
     },
-    "prescriber": {
-      "prescriberNPI": "2468135790",
-      "name": "Dr. Lisa Martinez",
-      "clinic": "Downtown Health Associates"
+    "prescriptor": {
+      "npiPrescriptor": "2468135790",
+      "nombre": "Dra. Lucía Gómez",
+      "clinica": "Instituto Médico Recoleta"
     },
-    "medication": {
-      "medicationName": "Metformin",
+    "medicamento": {
+      "nombreMedicamento": "Metformina",
       "ndc": "24680-1357-03",
-      "dosage": "500mg",
-      "quantity": 60,
-      "refills": 5,
-      "instructions": "Take one tablet twice daily with meals",
-      "expirationDate": "2024-10-15"
+      "dosis": "500mg",
+      "cantidad": 60,
+      "recargas": 5,
+      "instrucciones": "Tomar un comprimido dos veces al día con las comidas",
+      "fechaVencimiento": "2024-10-15"
     }
   },
   {
-    "patient": {
-      "patientId": "P13579246",
-      "name": "Sarah Thompson",
-      "dateOfBirth": "1985-07-12"
+    "paciente": {
+      "idPaciente": "P13579246",
+      "nombre": "Sara Torres",
+      "fechaNacimiento": "1985-07-12"
     },
-    "prescriber": {
-      "prescriberNPI": "1357924680",
-      "name": "Dr. James Wilson",
-      "clinic": "Eastside Medical Center"
+    "prescriptor": {
+      "npiPrescriptor": "1357924680",
+      "nombre": "Dr. Javier Sánchez",
+      "clinica": "Centro Médico San Telmo"
     },
-    "medication": {
-      "medicationName": "Lisinopril",
+    "medicamento": {
+      "nombreMedicamento": "Lisinopril",
       "ndc": "13579-2468-01",
-      "dosage": "10mg",
-      "quantity": 30,
-      "refills": 2,
-      "instructions": "Take one tablet daily in the morning",
-      "expirationDate": "2024-12-20"
+      "dosis": "10mg",
+      "cantidad": 30,
+      "recargas": 2,
+      "instrucciones": "Tomar un comprimido diariamente por la mañana",
+      "fechaVencimiento": "2024-12-20"
     }
   },
   {
-    "patient": {
-      "patientId": "P97531086",
-      "name": "David Garcia",
-      "dateOfBirth": "1973-04-18"
+    "paciente": {
+      "idPaciente": "P97531086",
+      "nombre": "Diego López",
+      "fechaNacimiento": "1973-04-18"
     },
-    "prescriber": {
-      "prescriberNPI": "9753108642",
-      "name": "Dr. Jennifer Smith",
-      "clinic": "Riverside Health Group"
+    "prescriptor": {
+      "npiPrescriptor": "9753108642",
+      "nombre": "Dra. Jimena Castro",
+      "clinica": "Grupo Médico Belgrano"
     },
-    "medication": {
-      "medicationName": "Sertraline",
+    "medicamento": {
+      "nombreMedicamento": "Sertralina",
       "ndc": "97531-0864-04",
-      "dosage": "50mg",
-      "quantity": 30,
-      "refills": 5,
-      "instructions": "Take one tablet daily with or without food",
-      "expirationDate": "2025-03-10"
+      "dosis": "50mg",
+      "cantidad": 30,
+      "recargas": 5,
+      "instrucciones": "Tomar un comprimido diariamente con o sin alimentos",
+      "fechaVencimiento": "2025-03-10"
     }
   },
   {
-    "patient": {
-      "patientId": "P36925814",
-      "name": "Jessica Brown",
-      "dateOfBirth": "1990-09-05"
+    "paciente": {
+      "idPaciente": "P36925814",
+      "nombre": "Jessica Moreno",
+      "fechaNacimiento": "1990-09-05"
     },
-    "prescriber": {
-      "prescriberNPI": "3692581470",
-      "name": "Dr. Robert Taylor",
-      "clinic": "Central Medical Associates"
+    "prescriptor": {
+      "npiPrescriptor": "3692581470",
+      "nombre": "Dr. Roberto Acosta",
+      "clinica": "Asociación Médica Caballito"
     },
-    "medication": {
-      "medicationName": "Levothyroxine",
+    "medicamento": {
+      "nombreMedicamento": "Levotiroxina",
       "ndc": "36925-8147-02",
-      "dosage": "75mcg",
-      "quantity": 90,
-      "refills": 3,
-      "instructions": "Take one tablet daily on an empty stomach",
-      "expirationDate": "2025-02-28"
+      "dosis": "75mcg",
+      "cantidad": 90,
+      "recargas": 3,
+      "instrucciones": "Tomar un comprimido diariamente con el estómago vacío",
+      "fechaVencimiento": "2025-02-28"
     }
   },
   {
-    "patient": {
-      "patientId": "P80246913",
-      "name": "Michael Anderson",
-      "dateOfBirth": "1968-12-03"
+    "paciente": {
+      "idPaciente": "P80246913",
+      "nombre": "Miguel Romero",
+      "fechaNacimiento": "1968-12-03"
     },
-    "prescriber": {
-      "prescriberNPI": "8024691357",
-      "name": "Dr. Sarah Johnson",
-      "clinic": "Valley Primary Care"
+    "prescriptor": {
+      "npiPrescriptor": "8024691357",
+      "nombre": "Dra. Sofía Rodríguez",
+      "clinica": "Clínica Valle Norte"
     },
-    "medication": {
-      "medicationName": "Amlodipine",
+    "medicamento": {
+      "nombreMedicamento": "Amlodipina",
       "ndc": "80246-9135-01",
-      "dosage": "5mg",
-      "quantity": 30,
-      "refills": 6,
-      "instructions": "Take one tablet daily in the evening",
-      "expirationDate": "2024-11-15"
+      "dosis": "5mg",
+      "cantidad": 30,
+      "recargas": 6,
+      "instrucciones": "Tomar un comprimido diariamente por la tarde",
+      "fechaVencimiento": "2024-11-15"
     }
   },
   {
-    "patient": {
-      "patientId": "P15948732",
-      "name": "Amanda Wilson",
-      "dateOfBirth": "1982-05-20"
+    "paciente": {
+      "idPaciente": "P15948732",
+      "nombre": "Ana Díaz",
+      "fechaNacimiento": "1982-05-20"
     },
-    "prescriber": {
-      "prescriberNPI": "1594873260",
-      "name": "Dr. Thomas Lee",
-      "clinic": "Harbor Family Medicine"
+    "prescriptor": {
+      "npiPrescriptor": "1594873260",
+      "nombre": "Dr. Tomás Varela",
+      "clinica": "Centro Médico Puerto Madero"
     },
-    "medication": {
-      "medicationName": "Escitalopram",
+    "medicamento": {
+      "nombreMedicamento": "Escitalopram",
       "ndc": "15948-7326-03",
-      "dosage": "10mg",
-      "quantity": 30,
-      "refills": 2,
-      "instructions": "Take one tablet daily at the same time each day",
-      "expirationDate": "2025-04-10"
+      "dosis": "10mg",
+      "cantidad": 30,
+      "recargas": 2,
+      "instrucciones": "Tomar un comprimido diariamente a la misma hora cada día",
+      "fechaVencimiento": "2025-04-10"
     }
   }
 ]
