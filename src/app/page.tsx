@@ -3,134 +3,18 @@ import React, { useState } from 'react';
 import { Container, Typography, Box, CircularProgress, Backdrop } from '@mui/material';
 import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
 import ResultBox from '../components/ResultBox';
-import { Utils, PushDrop, Random, Transaction, CreateActionOutput, Hash } from '@bsv/sdk'
 import SubmissionsLog from '@/components/SubmissionsLog';
-import { saveSubmission } from '@/utils/db';
-import prescriptions from '@/utils/prescriptions.json';
-import { doctor, patient } from '@/utils/wallets';
-
-export interface DataEntry {
-  paciente?: {
-    idPaciente: string;
-    nombre: string;
-    fechaNacimiento: string;
-  };
-  prescriptor?: {
-    npiPrescriptor: string;
-    nombre: string;
-    clinica: string;
-  };
-  medicamento?: {
-    nombreMedicamento: string;
-    ndc: string;
-    dosis: string;
-    cantidad: number;
-    recargas: number;
-    instrucciones: string;
-    fechaVencimiento: string;
-  };
-  farmacia?: {
-    npiFarmacia: string;
-    nombre: string;
-    farmaceutico: string;
-    fechaDispensacion: string;
-  };
-  timestamp: string;
-  id: string;
-  [key: string]: unknown;
-}
-
-export interface Token {
-  data: DataEntry;
-  txid: string;
-  tx: Transaction;
-}
-
-export interface Submission {
-  data: DataEntry;
-  txid: string;
-  step: string;
-  arc: unknown;
-}
+import PresentPrescriptionCard from '@/components/stages/PresentPrescriptionCard';
+import DispensePrescriptionCard from '@/components/stages/DispensePrescriptionCard';
+import AcknowledgeReceiptCard from '@/components/stages/AcknowledgeReceiptCard';
+import { Token } from '@/components/types';
 
 const App: React.FC = () => {
   const [prescription, setPrescription] = useState<Token | null>(null)
-  // const [collection, setCollection] = useState<Token | null>(null)
-  // const [dispensation, setDispensation] = useState<Token | null>(null)
-  // const [patientAcknowledgement, setPatientAcknowledgement] = useState<Token | null>(null)
+  const [presentation, setPresentation] = useState<Token | null>(null)
+  const [dispensation, setDispensation] = useState<Token | null>(null)
+  const [acknowledgement, setAcknowledgement] = useState<Token | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
-
-
-
-  /**
-   * Simulates data by picking from the example data
-   * @returns The simulated data
-   */
-  function simulateData(): DataEntry {
-    const data = prescriptions[Math.floor(Math.random() * prescriptions.length)] as DataEntry
-    data.timestamp = new Date().toISOString()
-    data.id = Utils.toBase64(Random(8))
-    return data
-  }
-
-  /**
-   * Uses the BSV Blockchain to create a token capturing the data, timestamping it, 
-   * and assigning ownership to the token.
-   * 
-   * @param data The data to be stored
-   * @param step The step of the process
-   * @returns The transaction ID and broadcast response
-   */
-  async function doctorCreatesPrescription() {
-    try {
-      setIsSubmitting(true)
-      let outputs: CreateActionOutput[] | undefined = undefined
-      const pushdrop = new PushDrop(doctor, 'https://prescription-tokens.vercel.app')
-      const prescriptionData = simulateData()
-      const jsonBlob = Utils.toArray(JSON.stringify(prescriptionData), 'utf8')
-      const documentHash = Hash.sha256(jsonBlob)
-
-      const { publicKey: patientIdentityKey } = await patient.getPublicKey({ identityKey: true })
-      
-      const lockingScript = await pushdrop.lock(
-        [documentHash],
-        [0, 'medical prescription'],
-        prescriptionData.id,
-        patientIdentityKey,
-        false, 
-        true,
-        'after'
-      )
-
-      const action = await doctor.createAction({
-        outputs: [{
-          lockingScript: lockingScript.toHex(),
-          satoshis: 3,
-          outputDescription: 'medical prescription issuance',
-        }],
-        description: 'Create prescription',
-        options: {
-          randomizeOutputs: false
-        }
-      })
-
-      const token: Token = {
-        data: prescriptionData,
-        txid: action.txid as string,
-        tx: Transaction.fromBEEF(action.tx as number[])
-      }
-
-      setPrescription(token)
-
-      await saveSubmission(token)
-
-    } catch (error) {
-      console.error('Error creating prescription:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   const boxSx = {
     display: 'flex',
@@ -170,20 +54,20 @@ const App: React.FC = () => {
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><CreatePrescriptionCard onSubmit={doctorCreatesPrescription} /></Box>
+          <Box sx={cardSx}><CreatePrescriptionCard setPrescription={setPrescription} setIsSubmitting={setIsSubmitting} /></Box>
           <ResultBox entry={prescription} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><PresentPrescriptionCard onSubmit={patientPresentsPrescription} /></Box>
-          <ResultBox entry={prescription} />
+          <Box sx={cardSx}><PresentPrescriptionCard setPresentation={setPresentation} setIsSubmitting={setIsSubmitting} /></Box>
+          <ResultBox entry={presentation} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><DispensePrescriptionCard onSubmit={pharmacyDispensesPrescription} /></Box>
-          <ResultBox entry={prescription} />
+          <Box sx={cardSx}><DispensePrescriptionCard setDispensation={setDispensation} setIsSubmitting={setIsSubmitting} /></Box>
+          <ResultBox entry={dispensation} />
         </Box>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><AcknowledgeReceiptCard onSubmit={patientAcknowledgesReceipt} /></Box>
-          <ResultBox entry={prescription} />
+          <Box sx={cardSx}><AcknowledgeReceiptCard setAcknowledgement={setAcknowledgement} setIsSubmitting={setIsSubmitting} /></Box>
+          <ResultBox entry={acknowledgement} />
         </Box>
       </Box>
       <SubmissionsLog change={isSubmitting} setPrescription={setPrescription} />

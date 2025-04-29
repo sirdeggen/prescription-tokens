@@ -58,7 +58,8 @@ const SubmissionsLog: React.FC<{ change: boolean, setPrescription: (token: Token
           )
           .map((entry) => {
             // Determine what kind of data to display based on the step
-            let displayText = `${entry.data.medicamento?.nombreMedicamento ?? ''} ${entry.data.medicamento?.dosis ?? ''} | ${entry.data.medicamento?.cantidad ?? ''} unidades`;
+            // Display patient name and medication details
+            let displayText = `${entry.data.paciente?.nombre ?? 'Paciente'}: ${entry.data.medicamento?.nombreMedicamento ?? ''} ${entry.data.medicamento?.dosis ?? ''} | ${entry.data.medicamento?.cantidad ?? ''} unidades`;
             
             return (
               <Stack
