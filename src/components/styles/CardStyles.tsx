@@ -14,20 +14,26 @@ export const cardContainerSx: SxProps<Theme> = {
   width: '100%',
   height: 'auto',
   borderRadius: 2,
-  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out',
+  boxShadow: '0 8px 24px rgba(44, 110, 142, 0.2)',
+  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
   '&:hover': {
     transform: 'translateY(-4px)',
-    boxShadow: '0 8px 24px rgba(44, 110, 142, 0.15)'
+    boxShadow: '0 8px 24px rgba(44, 110, 142, 0.2)',
   }
 };
 
 // Disabled card style
 export const disabledCardSx: SxProps<Theme> = {
-  opacity: 0.7,
+  width: '100%',
+  height: 'auto',
+  borderRadius: 2,
+  boxShadow: 'none',
+  opacity: 0.3,
   cursor: 'not-allowed',
   '&:hover': {
     transform: 'none',
-    boxShadow: 'none'
+    boxShadow: 'none',
+    cursor: 'not-allowed',
   }
 };
 

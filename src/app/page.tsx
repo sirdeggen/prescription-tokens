@@ -8,6 +8,9 @@ import PresentPrescriptionCard from '@/components/stages/PresentPrescriptionCard
 import DispensePrescriptionCard from '@/components/stages/DispensePrescriptionCard';
 import AcknowledgeReceiptCard from '@/components/stages/AcknowledgeReceiptCard';
 import { Token } from '@/components/types';
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
+import { clearAllSubmissions } from "@/utils/db";
 
 const App: React.FC = () => {
   const [prescription, setPrescription] = useState<Token | null>(null)
@@ -31,6 +34,16 @@ const App: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, minHeight: '100vh', display: 'flex', flexDirection: 'column', pt: 10, pb: 40, bgcolor: '#f8fbfd' }}>
+      <IconButton
+        onClick={async () => {
+          await clearAllSubmissions();
+          window.location.reload();
+        }}
+        style={{ position: "absolute", top: 24, right: 24, color: "white", backgroundColor: "#8e0e2c", borderRadius: "50%", height: "40px", width: "40px" }}
+        aria-label="Reset all submissions"
+      >
+        <DeleteIcon />
+      </IconButton>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={isSubmitting}
@@ -54,7 +67,7 @@ const App: React.FC = () => {
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box sx={boxSx}>
-          <Box sx={cardSx}><CreatePrescriptionCard setPrescription={setPrescription} setIsSubmitting={setIsSubmitting} /></Box>
+          <Box sx={cardSx}><CreatePrescriptionCard outstanding={prescription ?? presentation ?? dispensation ?? acknowledgement} setPrescription={setPrescription} setIsSubmitting={setIsSubmitting} /></Box>
           <ResultBox entry={prescription} />
         </Box>
         <Box sx={boxSx}>

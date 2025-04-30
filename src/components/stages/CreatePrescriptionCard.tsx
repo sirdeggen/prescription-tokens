@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
-import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
+import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx, disabledCardSx } from '../styles/CardStyles';
 import { DataEntry, Token } from '../types';
 import { doctorPromise, patientIdentityKey } from '@/utils/wallets';
 import { saveSubmission } from '@/utils/db';
@@ -9,11 +9,12 @@ import prescriptions from '@/utils/prescriptions.json';
 import { Utils, PushDrop, Random, Hash } from '@bsv/sdk'
 
 interface CreatePrescriptionCardProps {
+  outstanding: Token | null;
   setPrescription: (token: Token) => void;
   setIsSubmitting: (isSubmitting: boolean) => void;
 }
 
-const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPrescription, setIsSubmitting }) => {
+const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ outstanding, setPrescription, setIsSubmitting }) => {
 
   /**
    * Simulates data by picking from the example data
@@ -61,9 +62,12 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPres
         }],
         description: 'Create prescription',
         options: {
-          randomizeOutputs: false
+          randomizeOutputs: false,
+          acceptDelayedBroadcast: false
         }
       })
+
+      console.log({ action })
 
       const token: Token = {
         data: { ...prescriptionData, estado: 'creado'},
@@ -84,13 +88,11 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPres
     }
   }
 
+  const cardSx = outstanding ? disabledCardSx : cardContainerSx
+
   return (
-    <Card sx={{
-      ...cardContainerSx,
-      boxShadow: '0 4px 12px rgba(44, 110, 142, 0.2)',
-      borderTop: '4px solid #2c6e8e',
-    }}>
-      <CardActionArea onClick={doctorCreatesPrescription}>
+    <Card sx={cardSx}>
+      <CardActionArea disabled={!!outstanding} onClick={doctorCreatesPrescription}>
         <CardMedia
           component="img"
           image="/images/prescription.png"

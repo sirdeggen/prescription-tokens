@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
-import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
+import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx, disabledCardSx } from '../styles/CardStyles';
 import { Token } from '../types';
 import { PushDrop, Transaction, Utils, WalletInterface } from '@bsv/sdk';
 import { patientIdentityKey, pharmacy } from '@/utils/wallets';
@@ -83,13 +83,11 @@ const DispensePrescriptionCard: React.FC<DispensePrescriptionCardProps> = ({ pre
       }
     }
 
+    const cardSx = !presentation ? disabledCardSx : cardContainerSx
+
   return (
-    <Card sx={{
-      ...cardContainerSx,
-      boxShadow: '0 4px 12px rgba(44, 110, 142, 0.2)',
-      borderTop: '4px solid #2c6e8e',
-    }}>
-      <CardActionArea onClick={pharmacistDispensesMedication}>
+    <Card sx={cardSx}>
+      <CardActionArea onClick={pharmacistDispensesMedication} disabled={!presentation}>
         <CardMedia
           component="img"
           image="/images/dispense.png"
