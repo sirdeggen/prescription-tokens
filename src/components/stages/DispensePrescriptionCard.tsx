@@ -70,8 +70,8 @@ const DispensePrescriptionCard: React.FC<DispensePrescriptionCardProps> = ({ pre
           spent: false
         }
   
-        setDispensation(null)
-        setPresentation(token)
+        setPresentation(null)
+        setDispensation(token)
   
         await saveSubmission(token)
         await setSpent(presentation!.txid)

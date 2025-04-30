@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
 import { Token } from '../types';
-import { Transaction, PushDrop, Utils, WalletInterface, Script } from '@bsv/sdk';
+import { Transaction, PushDrop, Utils, WalletInterface, Script, OP } from '@bsv/sdk';
 import { patient, pharmacyIdentityKey } from '@/utils/wallets';
 import { saveSubmission, setSpent } from '@/utils/db';
 
@@ -40,7 +40,12 @@ const AcknowledgeReceiptCard: React.FC<AcknowledgeReceiptCardProps> = ({ dispens
     
           const timestamp = new Date().toISOString()
           
-          const lockingScript = Script.fromASM('OP_FALSE OP_RETURN ' + Utils.toHex(arId))
+          const lockingScript = new Script()
+          lockingScript.writeOpCode(OP.OP_FALSE)
+          lockingScript.writeOpCode(OP.OP_RETURN)
+          lockingScript.writeBin(Utils.toArray('recibido', 'utf8'))
+          lockingScript.writeBin(arId)
+
           tx.addOutput({
             lockingScript,
             satoshis: 0
@@ -57,13 +62,16 @@ const AcknowledgeReceiptCard: React.FC<AcknowledgeReceiptCardProps> = ({ dispens
             txid: tx.id('hex'),
             tx: tx.toBEEF(),
             status: 'acknowledged',
-            spent: false
+            spent: true
           }
     
           setDispensation(null)
           setAcknowledgement(token)
     
           await setSpent(dispensation!.txid)
+          await saveSubmission(token)
+
+          console.log({ tx: tx.toHexBEEF() })
 
           const broadcast = async (BEEF: number[]) => {
             const response = await fetch('https://arc.taal.com/v1/tx', {

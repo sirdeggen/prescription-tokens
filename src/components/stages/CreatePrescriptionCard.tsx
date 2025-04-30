@@ -66,7 +66,7 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPres
       })
 
       const token: Token = {
-        data: prescriptionData,
+        data: { ...prescriptionData, estado: 'creado'},
         txid: action.txid as string,
         tx: action.tx as number[],
         status: 'created',
