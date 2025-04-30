@@ -3,10 +3,10 @@ import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
 import { DataEntry, Token } from '../types';
-import { doctor, patientIdentityKey } from '@/utils/wallets';
+import { doctorPromise, patientIdentityKey } from '@/utils/wallets';
 import { saveSubmission } from '@/utils/db';
 import prescriptions from '@/utils/prescriptions.json';
-import { Utils, PushDrop, Random, CreateActionOutput, Hash } from '@bsv/sdk'
+import { Utils, PushDrop, Random, Hash } from '@bsv/sdk'
 
 interface CreatePrescriptionCardProps {
   setPrescription: (token: Token) => void;
@@ -36,8 +36,8 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ setPres
    */
   async function doctorCreatesPrescription() {
     try {
+      const doctor = await doctorPromise
       setIsSubmitting(true)
-      let outputs: CreateActionOutput[] | undefined = undefined
       const pushdrop = new PushDrop(doctor, 'https://prescription-tokens.vercel.app')
       const prescriptionData = simulateData()
       const jsonBlob = Utils.toArray(JSON.stringify(prescriptionData), 'utf8')

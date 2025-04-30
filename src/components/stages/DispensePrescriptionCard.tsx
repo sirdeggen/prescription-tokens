@@ -2,9 +2,9 @@
 import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx } from '../styles/CardStyles';
-import { Token, DataEntry } from '../types';
-import { PushDrop, Transaction, Hash, Utils, WalletInterface } from '@bsv/sdk';
-import { doctorIdentityKey, patientIdentityKey, pharmacy } from '@/utils/wallets';
+import { Token } from '../types';
+import { PushDrop, Transaction, Utils, WalletInterface } from '@bsv/sdk';
+import { patientIdentityKey, pharmacy } from '@/utils/wallets';
 import { setSpent, saveSubmission } from '@/utils/db';
 
 interface DispensePrescriptionCardProps {

@@ -40,7 +40,7 @@ const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription,
         }
       })
     })
-  }, [change])
+  }, [change, getAllSubmissions])
 
   if (!tokens || tokens.length === 0) {
     return null;
@@ -85,7 +85,7 @@ const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription,
           )
           .map((entry) => {
             // displayText ought to be the id of the prescription data.id and the timestamp in Locale format
-            let displayText = `${entry.data.status} - ${entry.data.id} - ${new Date(entry.data.timestamp).toLocaleString()}`
+            const displayText = `${entry.data.status} - ${entry.data.id} - ${new Date(entry.data.timestamp).toLocaleString()}`
             
             return (
               <Stack

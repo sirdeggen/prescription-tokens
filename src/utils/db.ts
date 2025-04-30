@@ -1,6 +1,6 @@
 "use client"
 
-import { Token } from "@/app/page";
+import { Token } from "../components/types";
 
 // IndexedDB utility for the Gas Chain application
 // Handles storage of submissions in a client-side database

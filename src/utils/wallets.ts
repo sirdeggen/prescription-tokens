@@ -41,6 +41,6 @@ const createLocalWallet = (owner: "patient" | "pharmacy"): ProtoWallet => {
     return wallet
 }
 
-export const doctor = await createWalletClient()
+export const doctorPromise = createWalletClient()
 export const patient = createLocalWallet('patient')
 export const pharmacy = createLocalWallet('pharmacy')
