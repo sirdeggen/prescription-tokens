@@ -115,10 +115,10 @@ const AcknowledgeReceiptCard: React.FC<AcknowledgeReceiptCardProps> = ({ dispens
             ...cardTitleSx,
             color: '#2c6e8e'
           }}>
-            Confirmar Recibo
+            Confirmación de Recepción
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={cardDescriptionSx}>
-            Confirmar el recibo de la receta digital
+            El paciente confirma que recibió el medicamento.
           </Typography>
         </CardContent>
       </CardActionArea>

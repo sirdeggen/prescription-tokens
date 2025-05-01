@@ -99,10 +99,10 @@ const PresentPrescriptionCard: React.FC<PresentPrescriptionCardProps> = ({ presc
             ...cardTitleSx,
             color: '#2c6e8e'
           }}>
-            Presentar Receta
+            Presentación de la Receta
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={cardDescriptionSx}>
-            Presentar una receta digital en la farmacia
+            El paciente presenta la receta al farmacéutico.
           </Typography>
         </CardContent>
       </CardActionArea>

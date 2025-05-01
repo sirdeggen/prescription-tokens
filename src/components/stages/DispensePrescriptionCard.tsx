@@ -99,10 +99,10 @@ const DispensePrescriptionCard: React.FC<DispensePrescriptionCardProps> = ({ pre
             ...cardTitleSx,
             color: '#2c6e8e'
           }}>
-            Dispensar Receta
+            Dispensación del Medicamento
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={cardDescriptionSx}>
-            Dispensar una receta digital al paciente
+            El farmacéutico certifica que el medicamento fue entregado.
           </Typography>
         </CardContent>
       </CardActionArea>
