@@ -104,7 +104,7 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ outstan
             ...cardTitleSx,
             color: '#2c6e8e'
           }}>
-            Crear Receta
+            Crear Receta Médica
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={cardDescriptionSx}>
             Crear una nueva receta digital para un paciente con detalles de medicamento

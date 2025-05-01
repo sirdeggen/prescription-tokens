@@ -1,20 +1,26 @@
 body {
   min-height: 100vh;
-  background: linear-gradient(to right, #a3ecce, #abdcff);
+  background: linear-gradient(135deg, #95bec4 0%, #b6ced5 50%, #a8bdcd 100%);
   margin: 0;
   padding: 0;
-  font-family: 'Helvetica', sans-serif;
+  font-family: var(--font-geist-sans), 'Helvetica', sans-serif;
+  color: #2c353d;
 }
 
 .log-entry {
-  border-left: 3px solid #1976d2;
-  padding: 10px;
+  border-left: 3px solid #2c6e8e;
+  padding: 12px;
   margin: 0;
+  transition: background-color 0.2s ease;
   animation: flashFade 5s ease-out;
 }
 
+.log-entry:hover {
+  background-color: rgba(44, 110, 142, 0.05);
+}
+
 .log-entry:nth-child(odd) {
-  background-color: #f0f0f0;
+  background-color: rgba(248, 251, 253, 0.8);
 }
 
 .log-entry:nth-child(even) {
@@ -23,11 +29,31 @@ body {
 
 @keyframes flashFade {
   0% {
-    background-color: rgba(25, 118, 210, 0.3);
+    background-color: rgba(44, 110, 142, 0.15);
   }
 
   100% {
     background-color: transparent;
   }
+}
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(44, 110, 142, 0.3);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(44, 110, 142, 0.5);
 }
