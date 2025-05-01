@@ -1,4 +1,3 @@
-"use client"
 import { SxProps, Theme } from '@mui/material';
 
 // Common styles for card media to maintain consistent aspect ratio

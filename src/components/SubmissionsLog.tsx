@@ -1,4 +1,3 @@
-"use client"
 import { Drawer, Paper, Typography, Stack, Box, IconButton, useTheme, Tooltip, Chip } from '@mui/material';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import { getAllSubmissions, clearAllSubmissions } from '../utils/db';
@@ -228,7 +227,6 @@ const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription,
                     <Box sx={{ minWidth: '110px' }}>
                       <Typography variant="caption" sx={{ 
                         color: theme.palette.text.secondary,
-                        fontFamily: 'var(--font-geist-mono)',
                         fontSize: '0.75rem',
                         whiteSpace: 'nowrap'
                       }}>
@@ -268,8 +266,7 @@ const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription,
                   </Box>
                   
                   <Box sx={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    <Typography variant="body2" sx={{ 
-                      fontFamily: 'var(--font-geist-mono)',
+                    <Typography variant="body2" sx={{
                       fontSize: '0.8rem',
                     }} noWrap>
                       {entry.data.id}
@@ -286,7 +283,6 @@ const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription,
                       }}>
                         <Typography variant="caption" sx={{ 
                           color: theme.palette.text.secondary,
-                          fontFamily: 'var(--font-geist-mono)',
                           fontSize: '0.7rem',
                         }}>
                           {entry.txid}

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Container, Typography, Box, CircularProgress, Backdrop, Paper } from '@mui/material';
-import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
-import ResultBox from '../components/ResultBox';
-import SubmissionsLog from '@/components/SubmissionsLog';
-import PresentPrescriptionCard from '@/components/stages/PresentPrescriptionCard';
-import DispensePrescriptionCard from '@/components/stages/DispensePrescriptionCard';
-import AcknowledgeReceiptCard from '@/components/stages/AcknowledgeReceiptCard';
-import { Token } from '@/components/types';
+import CreatePrescriptionCard from './components/stages/CreatePrescriptionCard';
+import ResultBox from './components/ResultBox';
+import SubmissionsLog from './components/SubmissionsLog';
+import PresentPrescriptionCard from './components/stages/PresentPrescriptionCard';
+import DispensePrescriptionCard from './components/stages/DispensePrescriptionCard';
+import AcknowledgeReceiptCard from './components/stages/AcknowledgeReceiptCard';
+import { Token } from './components/types';
 
 const App: React.FC = () => {
   const [prescription, setPrescription] = useState<Token | null>(null)

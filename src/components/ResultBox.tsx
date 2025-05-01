@@ -1,4 +1,3 @@
-"use client"
 import React, { useState } from 'react';
 import { Box, IconButton, Typography, Paper, Divider, Chip, Tooltip, useTheme } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
@@ -149,8 +148,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
                   variant="body2" 
                   sx={{ 
                     color: theme.palette.text.primary,
-                    fontSize: '0.85rem',
-                    fontFamily: 'var(--font-geist-mono)'
+                    fontSize: '0.85rem'
                   }}
                 >
                   {entry[key as keyof Token]}
@@ -193,8 +191,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
                     overflow: 'hidden', 
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    fontSize: '0.85rem',
-                    fontFamily: 'var(--font-geist-mono)'
+                    fontSize: '0.85rem'
                   }}
                 >
                   {startingData.txid}

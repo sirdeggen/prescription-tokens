@@ -3,8 +3,8 @@ import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/m
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx, disabledCardSx } from '../styles/CardStyles';
 import { Token } from '../types';
 import { Transaction, PushDrop, Utils, WalletInterface, Script, OP } from '@bsv/sdk';
-import { patient, pharmacyIdentityKey } from '@/utils/wallets';
-import { saveSubmission, setSpent } from '@/utils/db';
+import { patient, pharmacyIdentityKey } from '../../utils/wallets';
+import { saveSubmission, setSpent } from '../../utils/db';
 
 interface AcknowledgeReceiptCardProps {
   dispensation: Token | null;
@@ -106,7 +106,7 @@ const AcknowledgeReceiptCard: React.FC<AcknowledgeReceiptCardProps> = ({ dispens
       <CardActionArea disabled={!dispensation} onClick={patientAcknowledgesReceipt}>
         <CardMedia
           component="img"
-          image="/images/acknowledge.png"
+          image="/acknowledge.png"
           alt="Acknowledge Receipt"
           sx={cardMediaSx}
         />

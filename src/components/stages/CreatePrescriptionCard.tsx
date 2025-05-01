@@ -1,11 +1,10 @@
-"use client"
 import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx, disabledCardSx } from '../styles/CardStyles';
 import { DataEntry, Token } from '../types';
-import { doctorPromise, patientIdentityKey } from '@/utils/wallets';
-import { saveSubmission } from '@/utils/db';
-import prescriptions from '@/utils/prescriptions.json';
+import { doctorPromise, patientIdentityKey } from '../../utils/wallets';
+import { saveSubmission } from '../../utils/db';
+import prescriptions from '../../utils/prescriptions.json';
 import { Utils, PushDrop, Random, Hash } from '@bsv/sdk'
 
 interface CreatePrescriptionCardProps {
@@ -95,7 +94,7 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ outstan
       <CardActionArea disabled={!!outstanding} onClick={doctorCreatesPrescription}>
         <CardMedia
           component="img"
-          image="/images/prescription.png"
+          image={'/prescription.png'}
           alt="Create Prescription"
           sx={cardMediaSx}
         />

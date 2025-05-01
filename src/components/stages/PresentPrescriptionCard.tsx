@@ -1,11 +1,10 @@
-"use client"
 import React from 'react';
 import { Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
 import { cardMediaSx, cardContainerSx, cardTitleSx, cardDescriptionSx, disabledCardSx } from '../styles/CardStyles';
 import { Token, DataEntry } from '../types';
 import { PushDrop, Transaction, Hash, Utils, WalletInterface } from '@bsv/sdk';
-import { patient, doctorIdentityKey, pharmacyIdentityKey } from '@/utils/wallets';
-import { setSpent, saveSubmission } from '@/utils/db';
+import { patient, doctorIdentityKey, pharmacyIdentityKey } from '../../utils/wallets';
+import { setSpent, saveSubmission } from '../../utils/db';
 
 interface PresentPrescriptionCardProps {
   prescription: Token | null;
@@ -90,7 +89,7 @@ const PresentPrescriptionCard: React.FC<PresentPrescriptionCardProps> = ({ presc
       <CardActionArea disabled={!prescription} onClick={patientPresentsPrescriptionAtPharmacy}>
         <CardMedia
           component="img"
-          image="/images/present.png"
+          image="/present.png"
           alt="Present Prescription"
           sx={cardMediaSx}
         />

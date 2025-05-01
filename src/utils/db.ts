@@ -1,5 +1,3 @@
-"use client"
-
 import { Token } from "../components/types";
 
 // IndexedDB utility for the Gas Chain application

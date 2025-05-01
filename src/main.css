@@ -1,9 +1,12 @@
+:root {
+  font-family: 'Helvetica', sans-serif;
+}
+
 body {
   min-height: 100vh;
   background: linear-gradient(135deg, #95bec4 0%, #b6ced5 50%, #a8bdcd 100%);
   margin: 0;
   padding: 0;
-  font-family: var(--font-geist-sans), 'Helvetica', sans-serif;
   color: #2c353d;
 }
 
@@ -13,7 +16,7 @@ body {
   margin: 0;
   transition: background-color 0.2s ease;
   animation: flashFade 5s ease-out;
-}
+} 
 
 .log-entry:hover {
   background-color: rgba(44, 110, 142, 0.05);
