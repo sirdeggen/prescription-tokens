@@ -1,10 +1,10 @@
 import { PrivateKey, KeyDeriver, ProtoWallet, WalletClient } from '@bsv/sdk'
 import { WalletStorageManager, Services, Wallet, StorageClient } from '@bsv/wallet-toolbox-client'
 
-const doctorKey = process.env.NEXT_PUBLIC_DOCTOR_KEY!
-const patientKey = process.env.NEXT_PUBLIC_PATIENT_KEY!
-const pharmacyKey = process.env.NEXT_PUBLIC_PHARMACY_KEY!
-const walletStorageUrl = process.env.NEXT_PUBLIC_WALLET_STORAGE_URL!
+const doctorKey = import.meta.env.VITE_DOCTOR_KEY!
+const patientKey = import.meta.env.VITE_PATIENT_KEY!
+const pharmacyKey = import.meta.env.VITE_PHARMACY_KEY!
+const walletStorageUrl = import.meta.env.VITE_WALLET_STORAGE_URL!
 
 export const doctorIdentityKey = PrivateKey.fromHex(doctorKey).toPublicKey().toString()
 export const patientIdentityKey = PrivateKey.fromHex(patientKey).toPublicKey().toString()

@@ -1,4 +1,3 @@
-"use client"
 import React, { useState } from 'react';
 import { Container, Typography, Box, CircularProgress, Backdrop, Paper } from '@mui/material';
 import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
