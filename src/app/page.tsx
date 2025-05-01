@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { Container, Typography, Box, CircularProgress, Backdrop, Paper, useTheme, useMediaQuery } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Backdrop, Paper } from '@mui/material';
 import CreatePrescriptionCard from '../components/stages/CreatePrescriptionCard';
 import ResultBox from '../components/ResultBox';
 import SubmissionsLog from '@/components/SubmissionsLog';
@@ -15,9 +15,6 @@ const App: React.FC = () => {
   const [dispensation, setDispensation] = useState<Token | null>(null)
   const [acknowledgement, setAcknowledgement] = useState<Token | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const boxSx = {
     display: 'flex',
