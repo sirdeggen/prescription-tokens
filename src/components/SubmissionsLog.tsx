@@ -8,22 +8,16 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Token } from '../components/types';
+import { useBroadcast } from '../context/broadcast';
 
-interface SubmissionLogProps { 
-  change: boolean; 
-  setPrescription: (token: Token | null) => void;
-  setPresentation: (token: Token | null) => void;
-  setDispensation: (token: Token | null) => void;
-  setAcknowledgement: (token: Token | null) => void;
-}
-
-const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription, setPresentation, setDispensation, setAcknowledgement }) => {
+const SubmissionsLog: React.FC = () => {
+  const { isSubmitting, setPrescription, setPresentation, setDispensation, setAcknowledgement } = useBroadcast()
   const [tokens, setTokens] = useState<Token[]>([])
   const [isMinimized, setIsMinimized] = useState(false);
   const theme = useTheme();
 
   useEffect(() => {
-    if (!change) getAllSubmissions().then(tokens => {
+    if (!isSubmitting) getAllSubmissions().then(tokens => {
       setTokens(tokens)
       tokens.forEach(token => {
         if (token.spent) return
@@ -45,7 +39,7 @@ const SubmissionsLog: React.FC<SubmissionLogProps> = ({ change, setPrescription,
         }
       })
     })
-  }, [change, getAllSubmissions])
+  }, [isSubmitting, getAllSubmissions])
 
   const handleClearAll = async () => {
     await clearAllSubmissions();

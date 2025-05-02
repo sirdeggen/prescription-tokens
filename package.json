@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bsv/sdk": "^1.4.22",
-    "@bsv/wallet-toolbox-client": "^1.2.48",
+    "@bsv/sdk": "^1.4.24",
+    "@bsv/wallet-toolbox-client": "^1.3.19",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",

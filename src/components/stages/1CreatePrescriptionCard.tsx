@@ -6,14 +6,12 @@ import { doctorPromise, patientIdentityKey } from '../../utils/wallets';
 import { saveSubmission } from '../../utils/db';
 import prescriptions from '../../utils/prescriptions.json';
 import { Utils, PushDrop, Random, Hash } from '@bsv/sdk'
+import { useBroadcast } from '../../context/broadcast';
 
-interface CreatePrescriptionCardProps {
-  outstanding: Token | null;
-  setPrescription: (token: Token) => void;
-  setIsSubmitting: (isSubmitting: boolean) => void;
-}
+const CreatePrescriptionCard: React.FC = () => {
+  const { prescription, presentation, dispensation, acknowledgement, setPrescription, setIsSubmitting, addToQueue, isSubmitting } = useBroadcast()
 
-const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ outstanding, setPrescription, setIsSubmitting }) => {
+  const outstanding = prescription ?? presentation ?? dispensation ?? acknowledgement
 
   /**
    * Simulates data by picking from the example data
@@ -36,6 +34,7 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ outstan
    */
   async function doctorCreatesPrescription() {
     try {
+      if (isSubmitting) return
       const doctor = await doctorPromise
       setIsSubmitting(true)
       const pushdrop = new PushDrop(doctor, 'https://prescription-tokens.vercel.app')
@@ -62,7 +61,8 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ outstan
         description: 'Create prescription',
         options: {
           randomizeOutputs: false,
-          acceptDelayedBroadcast: false
+          acceptDelayedBroadcast: false,
+          noSend: true
         }
       })
 
@@ -76,7 +76,9 @@ const CreatePrescriptionCard: React.FC<CreatePrescriptionCardProps> = ({ outstan
         spent: false
       }
 
+      
       setPrescription(token)
+      addToQueue(token)
 
       await saveSubmission(token)
 

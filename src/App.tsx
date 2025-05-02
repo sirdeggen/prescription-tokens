@@ -1,20 +1,15 @@
-import React, { useState } from 'react';
-import { Container, Typography, Box, CircularProgress, Backdrop, Paper } from '@mui/material';
-import CreatePrescriptionCard from './components/stages/CreatePrescriptionCard';
+import React from 'react';
+import { Container, Typography, Box, Paper } from '@mui/material';
+import CreatePrescriptionCard from './components/stages/1CreatePrescriptionCard';
+import PresentPrescriptionCard from './components/stages/2PresentPrescriptionCard';
+import DispensePrescriptionCard from './components/stages/3DispensePrescriptionCard';
+import AcknowledgeReceiptCard from './components/stages/4AcknowledgeReceiptCard';
 import ResultBox from './components/ResultBox';
 import SubmissionsLog from './components/SubmissionsLog';
-import PresentPrescriptionCard from './components/stages/PresentPrescriptionCard';
-import DispensePrescriptionCard from './components/stages/DispensePrescriptionCard';
-import AcknowledgeReceiptCard from './components/stages/AcknowledgeReceiptCard';
-import { Token } from './components/types';
+import { useBroadcast } from './context/broadcast';
 
 const App: React.FC = () => {
-  const [prescription, setPrescription] = useState<Token | null>(null)
-  const [presentation, setPresentation] = useState<Token | null>(null)
-  const [dispensation, setDispensation] = useState<Token | null>(null)
-  const [acknowledgement, setAcknowledgement] = useState<Token | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const { prescription, presentation, dispensation, acknowledgement } = useBroadcast()
   const boxSx = {
     display: 'flex',
     gap: { xs: 3, md: 4 },
@@ -50,29 +45,6 @@ const App: React.FC = () => {
         position: 'relative',
         zIndex: 1,
       }}>
-        <Backdrop
-          sx={{ 
-            color: '#fff', 
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-          }}
-          open={isSubmitting}
-        >
-          <Paper sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-            bgcolor: 'rgba(0,0,0,0.85)',
-            p: 4,
-            borderRadius: 3,
-            backdropFilter: 'blur(4px)'
-          }}>
-            <CircularProgress color="primary" size={48} thickness={4} />
-            <Typography variant="h6" sx={{ mt: 3, color: 'white', fontWeight: 500 }}>
-              Procesando transacción...
-            </Typography>
-          </Paper>
-        </Backdrop>
-        
         <Paper elevation={0} sx={{ 
           textAlign: 'center', 
           p: { xs: 3, md: 4 }, 
@@ -100,31 +72,25 @@ const App: React.FC = () => {
         
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <Box sx={boxSx}>
-            <Box sx={cardSx}><CreatePrescriptionCard outstanding={prescription ?? presentation ?? dispensation ?? acknowledgement} setPrescription={setPrescription} setIsSubmitting={setIsSubmitting} /></Box>
+            <Box sx={cardSx}><CreatePrescriptionCard /></Box>
             <ResultBox entry={prescription} />
           </Box>
           <Box sx={boxSx}>
-            <Box sx={cardSx}><PresentPrescriptionCard prescription={prescription} setPrescription={setPrescription} setPresentation={setPresentation} setIsSubmitting={setIsSubmitting} /></Box>
+            <Box sx={cardSx}><PresentPrescriptionCard /></Box>
             <ResultBox entry={presentation} />
           </Box>
           <Box sx={boxSx}>
-            <Box sx={cardSx}><DispensePrescriptionCard presentation={presentation} setPresentation={setPresentation} setDispensation={setDispensation} setIsSubmitting={setIsSubmitting} /></Box>
+            <Box sx={cardSx}><DispensePrescriptionCard /></Box>
             <ResultBox entry={dispensation} />
           </Box>
           <Box sx={boxSx}>
-            <Box sx={cardSx}><AcknowledgeReceiptCard dispensation={dispensation} setDispensation={setDispensation} setAcknowledgement={setAcknowledgement} setIsSubmitting={setIsSubmitting} /></Box>
+            <Box sx={cardSx}><AcknowledgeReceiptCard /></Box>
             <ResultBox entry={acknowledgement} />
           </Box>
         </Box>
         <Box sx={{ mb: 50 }} />
       </Container>
-      <SubmissionsLog 
-        change={isSubmitting} 
-        setPrescription={setPrescription} 
-        setPresentation={setPresentation} 
-        setDispensation={setDispensation}
-        setAcknowledgement={setAcknowledgement}
-      />
+      <SubmissionsLog />
     </Box>
   );
 };

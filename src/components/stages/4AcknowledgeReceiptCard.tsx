@@ -5,18 +5,14 @@ import { Token } from '../types';
 import { Transaction, PushDrop, Utils, WalletInterface, Script, OP } from '@bsv/sdk';
 import { patient, pharmacyIdentityKey } from '../../utils/wallets';
 import { saveSubmission, setSpent } from '../../utils/db';
+import { useBroadcast } from '../../context/broadcast';
 
-interface AcknowledgeReceiptCardProps {
-  dispensation: Token | null;
-  setDispensation: (token: Token | null) => void;
-  setAcknowledgement: (token: Token) => void;
-  setIsSubmitting: (isSubmitting: boolean) => void;
-}
-
-const AcknowledgeReceiptCard: React.FC<AcknowledgeReceiptCardProps> = ({ dispensation, setDispensation, setAcknowledgement, setIsSubmitting }) => {
+const AcknowledgeReceiptCard: React.FC = () => {
+  const { addToQueue, dispensation, setDispensation, setAcknowledgement, setIsSubmitting, isSubmitting } = useBroadcast()
 
     async function patientAcknowledgesReceipt() {
         try {
+          if (isSubmitting) return
           const sourceTransaction = Transaction.fromBEEF(dispensation!.tx)
           setIsSubmitting(true)
           const pushdrop = new PushDrop(patient as WalletInterface, 'https://prescription-tokens.vercel.app')
@@ -67,30 +63,13 @@ const AcknowledgeReceiptCard: React.FC<AcknowledgeReceiptCardProps> = ({ dispens
     
           setDispensation(null)
           setAcknowledgement(token)
+          addToQueue(token)
     
           await setSpent(dispensation!.txid)
           await saveSubmission(token)
 
           console.log({ tx: tx.toHexBEEF() })
 
-          const broadcast = async (BEEF: number[]) => {
-            const response = await fetch('https://arc.taal.com/v1/tx', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/octet-stream',
-                'Accept': 'application/json',
-              },
-              body: new Blob([new Uint8Array(BEEF)]),
-            })
-            if (!response.ok) {
-              throw new Error('Failed to broadcast transaction')
-            }
-            const data = await response.json()
-            return data
-          }
-
-          const arcResponse = await broadcast(tx.toBEEF(false))
-          console.info({ arcResponse })    
         } catch (error) {
           console.error('Error creating prescription:', error)
         } finally {

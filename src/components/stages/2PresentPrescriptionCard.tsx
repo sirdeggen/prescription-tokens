@@ -5,18 +5,14 @@ import { Token, DataEntry } from '../types';
 import { PushDrop, Transaction, Hash, Utils, WalletInterface } from '@bsv/sdk';
 import { patient, doctorIdentityKey, pharmacyIdentityKey } from '../../utils/wallets';
 import { setSpent, saveSubmission } from '../../utils/db';
+import { useBroadcast } from '../../context/broadcast';
 
-interface PresentPrescriptionCardProps {
-  prescription: Token | null;
-  setPrescription: (token: Token | null) => void; 
-  setPresentation: (token: Token | null) => void;
-  setIsSubmitting: (isSubmitting: boolean) => void;
-}
-
-const PresentPrescriptionCard: React.FC<PresentPrescriptionCardProps> = ({ prescription, setPrescription, setPresentation, setIsSubmitting }) => {
+const PresentPrescriptionCard: React.FC = () => {
+  const { addToQueue, prescription, setPrescription, setPresentation, setIsSubmitting, isSubmitting } = useBroadcast()
 
   async function patientPresentsPrescriptionAtPharmacy() {
     try {
+      if (isSubmitting) return
       const sourceTransaction = Transaction.fromBEEF(prescription!.tx)
       setIsSubmitting(true)
       const pushdrop = new PushDrop(patient as WalletInterface, 'https://prescription-tokens.vercel.app')
@@ -69,8 +65,10 @@ const PresentPrescriptionCard: React.FC<PresentPrescriptionCardProps> = ({ presc
         spent: false
       }
 
+      
       setPrescription(null)
       setPresentation(token)
+      addToQueue(token)
 
       await saveSubmission(token)
       await setSpent(prescription!.txid)
