@@ -102,13 +102,16 @@ export const BroadcastProvider: React.FC<BroadcastProviderProps> = ({ children }
             console.log({ response })
             if (response.status === 200) {
                 // everything went well
-                const doctor = await doctorPromise
-                await Promise.allSettled(tx.inputs.map(async input => {
-                    await doctor.relinquishOutput({
-                        basket: 'default',
-                        output: itemToProcess.txid + '.' + input.sourceOutputIndex
-                    })
-                }))
+                // only do this if we're on the first step
+                if (itemToProcess.data.estado === 'creado') {
+                    const doctor = await doctorPromise
+                    await Promise.allSettled(tx.inputs.map(async input => {
+                        await doctor.relinquishOutput({
+                            basket: 'default',
+                            output: itemToProcess.txid + '.' + input.sourceOutputIndex
+                        })
+                    }))
+                }
             }
 
             // Remove the processed item from the queue
