@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bsv/sdk": "^1.4.24",
-    "@bsv/wallet-toolbox-client": "^1.3.19",
+    "@bsv/sdk": "^1.6.12",
+    "@bsv/wallet-toolbox-client": "^1.5.10",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@bsv/cars-cli": "^1.2.2",
-    "@bsv/lars": "^1.4.2",
+    "@bsv/lars": "^1.5.3",
     "@eslint/js": "^9.22.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
