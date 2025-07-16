@@ -6,6 +6,7 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Token } from '../components/types';
+import { VITE_TAAL_TOKEN } from '../context/broadcast';
 
 interface ResultBoxProps {
   entry: Token | null,
@@ -22,7 +23,7 @@ const ResultBox: React.FC<ResultBoxProps> = ({ entry: startingData }) => {
 
   const getStatus = async () => {
     if (!startingData?.txid) return;
-    const res = await (await fetch('https://arc.taal.com/v1/tx/' + startingData.txid)).json()
+    const res = await (await fetch('https://arc.taal.com/v1/tx/' + startingData.txid, { headers: { 'Authorization': 'Bearer ' + VITE_TAAL_TOKEN } })).json()
     setArcData(res)
   }
 
