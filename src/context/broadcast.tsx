@@ -3,8 +3,6 @@ import { Token } from '../components/types';
 import { Transaction } from '@bsv/sdk';
 import { doctorPromise } from '../utils/wallets';
 
-const VITE_TAAL_TOKEN = import.meta.env.VITE_TAAL_TOKEN!
-
 // Define the structure of our context
 interface BroadcastContextType {
     queue: Token[];
@@ -54,10 +52,9 @@ interface BroadcastProviderProps {
 const broadcast = async (tx: Transaction) => {
     try {
         const beef = tx.toBEEF()
-        const response = await fetch('https://arc.taal.com/v1/tx', {
+        const response = await fetch('https://arc.gorillapool.io/v1/tx', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + VITE_TAAL_TOKEN,
                 'Content-Type': 'application/octet-stream',
                 'Accept': 'application/json',
             },
